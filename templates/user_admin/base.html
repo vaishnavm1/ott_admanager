@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h1>Insert Post Page</h1>
+    <form method = "post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Upload</button>
+    </form>
+    <a href="{% url 'view_posts' %}" >View Images</a>
+</body>
+<script>
+    var form = document.querySelector("form");
+    form.addEventListener("submit", (e)=>{
+        e.preventDefault();
+        alert("Form Submitted");
+        let url = `{% url 'home' %}`;
+        fetch(url, {
+            method: "POST",
+            body: new FormData(form)
+        })
+        .then( res => {
+            return res.json()
+        })
+        .then( data => {
+            let result = data['result'];
+            if(result == true){
+                alert("Data Inserted!");
+            }
+            else{
+                alert("Error in Data Insertion");
+            }
+        })
+    })
+</script>
+</html>

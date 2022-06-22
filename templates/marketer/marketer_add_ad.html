@@ -1,0 +1,258 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Marketer Home</title>
+    <link rel="stylesheet" href="{% static "assets/css/style.css" %}" />
+    <style>
+      .datetime-boxes input{
+        display: flex;
+        margin: 10px 0;
+        /* margin: 10px 0; */
+      }
+    </style>
+</head>
+<body>
+    <header class="cd-main-header js-cd-main-header">
+        <div class="cd-logo-wrapper">
+          <a href="#0" class="cd-logo"><img src="assets/img/cd-logo.svg" alt="OTT Logo"></a>
+          <!-- <a href="#" class="cd-logo">OTT</a> -->
+        </div>
+        
+        <div class="cd-reset js-cd-search">
+          <form>
+            <!-- <input class="reset" type="search" placeholder="Search..."> -->
+          </form>
+        </div>
+      
+        <button class="reset cd-nav-trigger js-cd-nav-trigger" aria-label="Toggle menu"><span></span></button>
+      
+        <ul class="cd-nav__list js-cd-nav__list">
+          <li class="cd-nav__item"><a href="#0">Tour</a></li>
+          <li class="cd-nav__item"><a href="#0">Support</a></li>
+          <li class="cd-nav__item cd-nav__item--has-children cd-nav__item--account js-cd-item--has-children">
+            <a href="#0">
+              <img src="https://svgshare.com/i/iPh.svg" alt="avatar">
+              <span>Account</span>
+            </a>
+        
+            <ul class="cd-nav__sub-list">
+              <li class="cd-nav__sub-item"><a href="#0">My Account</a></li>
+              <li class="cd-nav__sub-item"><a href="#0">Edit Account</a></li>
+              <li class="cd-nav__sub-item"><a href="#0">Logout</a></li>
+            </ul>
+          </li>
+        </ul>
+      </header> <!-- .cd-main-header -->
+      
+      <main class="cd-main-content">
+        <nav class="cd-side-nav js-cd-side-nav">
+          <ul class="cd-side__list js-cd-side__list">
+            <li class="cd-side__label"><span>Main</span></li>
+            {% comment %} <li class="cd-side__item cd-side__item--has-children cd-side__item--overview js-cd-item--has-children">
+              <a href="#0">Overview</a>
+              
+              <ul class="cd-side__sub-list">
+                <li class="cd-side__sub-item"><a href="#0">All Data</a></li>
+                <li class="cd-side__sub-item"><a href="#0">Category 1</a></li>
+                <li class="cd-side__sub-item"><a href="#0">Category 2</a></li>
+              </ul>
+            </li> {% endcomment %}
+    
+            <li class="cd-side__item cd-side__item--has-children cd-side__item--users js-cd-item--has-children">
+              <a href="#0">My Clients</a>
+              
+              <ul class="cd-side__sub-list">
+                <li class="cd-side__sub-item"><a href="#0">Add Client</a></li>
+                <li class="cd-side__sub-item"><a href="#0">Edit Client</a></li>
+              </ul>
+            </li>
+            
+            <li class="cd-side__item cd-side__item--has-children cd-side__item--comments  js-cd-item--has-children">
+                <a href="#0">Comments</a>
+                
+                <ul class="cd-side__sub-list">
+                    <li class="cd-side__sub-item"><a  href="#0">All Comments</a></li>
+                    <li class="cd-side__sub-item"><a href="#0">Edit Comment</a></li>
+                    <li class="cd-side__sub-item"><a href="#0">Delete Comment</a></li>
+                </ul>
+            </li>
+            <li class="cd-side__item cd-side__item--has-children cd-side__item--users cd-side__item--selected js-cd-item--has-children">
+              <a href="#">Manage My Ads</a>
+              
+              <ul class="cd-side__sub-list">
+                <li class="cd-side__sub-item"><a  aria-current="page" href="#0">Add Ad</a></li>
+                <li class="cd-side__sub-item"><a href="#0">View/Edit Ad</a></li>
+              </ul>
+            </li>
+          </ul>
+        
+           
+    
+             
+         
+        
+          
+        </nav>
+        <div class="cd-content-wrapper">
+            <h1>Add Advt</h1>
+            <form method="POST" id="myForm" enctype="multipart/form-data">
+                <br>
+                Select Client : <select name="customer" id="customer" required>
+                    <option disabled="" selected="" value="0"> -- Select Client -- </option>
+                    {% for client in clients %}
+                    <option value="{{ client.id }}">{{ client.name }}</option>
+                    {% endfor %}
+                </select>
+                <br> <br>
+                <div class="main-cont">
+
+                    <div class="ad-details">
+                        {{ form.as_p }}
+                        <!-- <button type="button" id="clearImageBtn">Clear Ad Image</button> -->
+                        <br>
+                        <!-- <button id="remove-ad" type="button" disabled onclick="removeBtnClick(this)">Remove this Ad</button><br><br> -->
+                        <p>How many times you want to display ad ? </p>
+                        <select name="selectAdShowTimes" id="selectAdShowTimes" onchange="changeAdDisplayTime(this)">
+                          <option disabled="" selected="" value="0"> -- Select No of Ads -- </option>
+                          <option value="1" selected>1</option>
+                          <option value="2">2</option>
+                          <option value="3">3</option>
+                          <option value="4">4</option>
+                          <option value="5">5</option>
+                          <option value="6">6</option>
+                          <option value="7">7</option>
+                          <option value="8">8</option>
+                          <option value="9">9</option>
+                          <option value="10">10</option>
+                        </select>
+                        <br>Select Date & Time for Ad(s) Publishing : 
+                        <div class="datetime-boxes">
+                          <!-- <input type="datetime-local" id="ad-datetime" name="ad-datetime"> -->
+                        </div>
+                    </div>
+                </div>
+                <br>
+            <!-- <button id="add-ad" type="button">Add on more Ad</button> -->
+            
+            {% csrf_token %}
+            <input type="submit" name="submit" id="submitBtn" value="Submit">
+        </form>
+        {% if messages %}
+        {% for message in messages %}
+        
+        <b> {{ message }} </b>
+        {% endfor %}
+        {% endif %}
+
+    </div> <!-- .content-wrapper -->
+</main> <!-- .cd-main-content -->
+
+<script src="{% static "assets/js/util.js" %} "></script>
+    <script src="{% static "assets/js/menu-aim.js" %} "></script>
+    <script src="{% static "assets/js/main.js" %} "></script>
+    <script>
+
+      document.getElementById("selectAdShowTimes").selectedIndex = 0;
+
+      function changeAdDisplayTime(ele){
+        // let append_ele = '<input type="datetime-local" id="ad-datetime" name="ad-datetime">';
+
+        let no_of_ads = ele.value;
+        let append_ele = "";
+        let date_time_boxes = document.querySelector(".datetime-boxes");
+        date_time_boxes.innerHTML = "";
+        for(let i = 0; i < no_of_ads; i++){
+          append_ele = document.createElement("input");
+          append_ele.type = "datetime-local";
+          append_ele.id = "ad-datetime";
+          append_ele.name = "ad-datetime";
+          let cln = append_ele.cloneNode(true);
+          date_time_boxes.appendChild(cln);
+
+        }
+
+
+
+        
+        //     let para = document.querySelector(".ad-details");
+        //     var cln = para.cloneNode(true);
+        //     document.querySelector(".main-cont").appendChild(cln);
+
+        
+        //     let para = document.querySelector(".ad-details");
+        //     var cln = para.cloneNode(true);
+        //     document.querySelector(".main-cont").appendChild(cln);
+
+      }
+
+        // document.getElementById("remove-ad").disabled = true
+
+        // function removeBtnClick(btn){
+        //   btn.parentElement.remove();
+        //   if(document.querySelectorAll(".ad-details").length == 1){
+        //     console.log("Count is 1");
+        //     document.querySelectorAll("#remove-ad")[0].disabled = true;
+        //   }
+
+        // }
+
+        
+
+        let myForm = document.getElementById("myForm");
+        myForm.addEventListener("submit", (e)=>{
+            let form = document.getElementById("");
+            e.preventDefault();
+            let all_ads = document.querySelectorAll(".ad-details");
+            let msg = "Total Ads " + all_ads.length;
+            let url = `{% url 'marketer_save_ad' %}`;
+            fetch(url,{
+              "method": "POST",
+              "body": new FormData(myForm)
+            }).then(res =>{
+              return res.json()
+            })
+            .then(data => {
+              console.log(data);
+            })
+        })
+        
+        // let addAdBtn = document.getElementById("add-ad");
+        // addAdBtn.addEventListener("click", (e)=>{
+        //     document.getElementById("remove-ad").disabled = false
+
+        //     let para = document.querySelector(".ad-details");
+        //     var cln = para.cloneNode(true);
+        //     document.querySelector(".main-cont").appendChild(cln);
+            
+        //     let len = document.querySelectorAll(".ad-details").length;
+        //     let targetEle = document.querySelectorAll(".ad-details")[len - 1];
+        //     targetEle.querySelector("#id_desc").value = "";
+        //     targetEle.querySelector("input[type=file]").value = "";
+        //     targetEle.querySelector("#id_ad_pub_date").value = "";
+
+
+        // });
+        // var form = document.querySelector("form");
+        // form.addEventListener("submit", (e)=>{
+        //     e.preventDefault();
+        //     console.log("Form Submit");
+        // });
+
+        var form = document.querySelector("form");
+        
+        form.addEventListener("submit", (e)=>{
+            e.preventDefault();
+        });
+        
+        // let clearImageBtn = document.getElementById("clearImageBtn");
+        // clearImageBtn.addEventListener("click", (e)=>{
+        //     // document.getElementById("clearImageBtn").parentElement.querySelector("input[type=file]")
+        //     e.target.parentElement.querySelector("input[type=file]").value = "";
+        // })
+    </script>
+</body>
+</html>
