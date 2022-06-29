@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title></title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@300&display=swap');
+        *{
+            /* font-family: "Times New Roman", Times, serif; */
+            font-family: 'Open Sans', sans-serif;
+            /* letter-spacing: 2px; */
+
+        }
+        .container{
+            width: 800px;
+            margin: 0 auto;
+        }
+        #date{
+            position: fixed;
+            top: 20px;
+            right: 20px;
+        }
+        
+        
+        </style>
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-0evHe/X+R7YkIZDRvuzKMRqM+OrBnVFBL6DOitfPri4tjfHxaWutUpFmBp4vmVor" crossorigin="anonymous">
+</head>
+<body>
+    <div class="container">
+        <center><h1><i>OnThisTime Media Pvt Ltd</i></h1></center>
+        <center><h3>Order Bill for {{ order.client_id.name }}</h3></center>
+        <h4 id="date">{{ order.created }}</h4>
+        <br>
+        <div class="agreement-container">
+            <hr>
+            <p>Following are the advertisements</p>
+            <table class="table table-bordered text-center">
+                <thead class="table-light">
+                  <tr>
+                    <th scope="col">Ad Number</th>
+                    <th scope="col">Ad Type</th>
+                    <th scope="col">Ad Rate</th>
+                    <th scope="col">Ad Publishing Date</th>
+                  </tr>
+                </thead>
+                <tbody class="table-group-divider">
+                    {% comment %} {% set count = 1 %} {% endcomment %}
+                    {%for advt in order.advt_set.all %}
+                        <tr>
+                            <th scope="row">{{ forloop.counter }}</th>
+                            <td>{{ advt.type.title }}</td>
+                            <td>{{ advt.type.rate }}</td>
+                            <td>{{ advt.ad_pub_date }}</td>
+                        </tr>
+                    {% endfor %}
+                   
+               
+                </tbody>
+              </table>
+              
+              <div class="client-sign">
+                
+                <br><br>
+                <h3>Total Bill : <b>{{ order.total_bill_amt }}</b></h3>
+                <h3>Status : <b>Paid</b></h3>
+              </div>
+        </div>
+
+    </div>
+</body>
+</html>

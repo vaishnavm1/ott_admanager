@@ -13,7 +13,7 @@ class UserCreationForm(forms.ModelForm):
     #removed email from fields
     class Meta:
         model = Account
-        fields = ('mobile_no', 'email', "full_name", "district", "taluka", "address" )
+        fields = ('mobile_no', 'email', "first_name", "middle_name", "last_name", "district", "taluka", "address" )
 
     def clean_password2(self):
         # Check that the two password entries match
@@ -40,7 +40,7 @@ class UserChangeForm(forms.ModelForm):
     #Added email from fields 
     class Meta:
         model = Account
-        fields = ('password', 'mobile_no', 'is_active', 'is_admin', 'email', "full_name", "district", "taluka", "address")
+        fields = ('password', 'mobile_no', 'is_active', 'is_admin', 'email', "first_name", "middle_name", "last_name", "district", "taluka", "address")
 
     def clean_password(self):
         # Regardless of what the user provides, return the initial value.
@@ -51,27 +51,27 @@ class UserChangeForm(forms.ModelForm):
 class AccountAdmin(UserAdmin):
     # list_display = ("email", "username", "date_joined","last_login","is_admin","is_staff")
     # list_display = ( "username", "date_joined","last_login","is_admin","is_staff", "mobile_no")
-    list_display = ( "email", "mobile_no", "username", "full_name", "district", "taluka", "address", "date_joined","last_login","is_admin","is_staff")
+    list_display = ( "email", "mobile_no", "username", "first_name", "middle_name", "last_name", "district", "taluka", "address", "date_joined","last_login","is_admin","is_staff")
     # search_fields = ("email", "username",)
     search_fields = ( "mobile_no", "email")
     readonly_fields = ("date_joined","last_login")
     filter_horizontal = ()
-    # list_filter = ("full_name", "district", "taluka", "address")
+    # list_filter = ("first_name", "middle_name", "last_name", "district", "taluka", "address")
     ordering = ('mobile_no', "email")
     fieldsets = (
             (None, {'fields' : ('password', "mobile_no", "username" , "email")}),
-                ('Personal Info', {"fields": ("full_name", "district", "taluka", "address")}),
+                ('Personal Info', {"fields": ("first_name", "middle_name", "last_name", "district", "taluka", "address")}),
                 ("Permissions", {"fields": ("is_admin", "is_staff","is_superuser", "is_active", "is_user_admin", "is_marketer", "is_publisher", "is_accountant")}),
             )
     add_fieldsets =   (
-                (None, {'fields' : ("email", "mobile_no",  'password1', 'password2', "full_name", "district", "taluka", "address", "is_user_admin", "is_marketer", "is_publisher", "is_accountant")}),
+                (None, {'fields' : ("email", "mobile_no",  'password1', 'password2', "first_name", "middle_name", "last_name", "district", "taluka", "address", "is_user_admin", "is_marketer", "is_publisher", "is_accountant")}),
             )
     #both fieldset and add_fieldsets had email field which is removed now... and below as well for fiedsets at 2nd pos and 1st pos at add_field
 
 
 
 class L2AdminAccount(UserAdmin):
-    list_display = ("date_joined","last_login","is_admin","is_staff", "mobile_no", "email", "full_name", "district", "taluka", "address")
+    list_display = ("date_joined","last_login","is_admin","is_staff", "mobile_no", "email", "first_name", "middle_name", "last_name", "district", "taluka", "address")
     search_fields = ("email", "mobile_no")
     readonly_fields = ("date_joined","last_login")
     filter_horizontal = ()
@@ -79,15 +79,15 @@ class L2AdminAccount(UserAdmin):
     ordering = ('mobile_no', "email")
     fieldsets = (
             (None, {'fields' : ('password', "mobile_no", "email")}),
-                ('Personal Info', {"fields": ("full_name", "district", "taluka", "address")}),
+                ('Personal Info', {"fields": ("first_name", "middle_name", "last_name", "district", "taluka", "address")}),
                 ("Permissions", {"fields": ("is_admin", "is_staff","is_superuser", "is_active", "is_user_admin", "is_marketer", "is_publisher", "is_accountant")}),
             )
     add_fieldsets = UserAdmin.add_fieldsets +  (
-                (None, {'fields' : ("mobile_no", "email", "full_name", "district", "taluka", "address", "is_active", "is_user_admin", "is_marketer", "is_publisher", "is_accountant")}),
+                (None, {'fields' : ("mobile_no", "email", "first_name", "middle_name", "last_name", "district", "taluka", "address", "is_active", "is_user_admin", "is_marketer", "is_publisher", "is_accountant")}),
             )
 
 class MarketerAccount(UserAdmin):
-    list_display = ("date_joined","last_login","is_admin","is_staff", "mobile_no", "email", "full_name", "district", "taluka", "address")
+    list_display = ("date_joined","last_login","is_admin","is_staff", "mobile_no", "email", "first_name", "middle_name", "last_name", "district", "taluka", "address")
     search_fields = ("email", "mobile_no")
     readonly_fields = ("date_joined","last_login")
     filter_horizontal = ()
@@ -95,15 +95,15 @@ class MarketerAccount(UserAdmin):
     ordering = ('mobile_no', "email")
     fieldsets = (
             (None, {'fields' : ('password', "mobile_no", "email")}),
-                ('Personal Info', {"fields": ("full_name", "district", "taluka", "address")}),
+                ('Personal Info', {"fields": ("first_name", "middle_name", "last_name", "district", "taluka", "address")}),
                 ("Permissions", {"fields": ("is_admin", "is_staff","is_superuser", "is_active", "is_user_admin", "is_marketer", "is_publisher", "is_accountant")}),
             )
     add_fieldsets = UserAdmin.add_fieldsets +  (
-                (None, {'fields' : ("mobile_no", "email", "full_name", "district", "taluka", "address", "is_user_admin", "is_marketer", "is_publisher", "is_accountant")}),
+                (None, {'fields' : ("mobile_no", "email", "first_name", "middle_name", "last_name", "district", "taluka", "address", "is_user_admin", "is_marketer", "is_publisher", "is_accountant")}),
             )
 
 class PublisherAccount(UserAdmin):
-    list_display = ("date_joined","last_login","is_admin","is_staff", "mobile_no", "email", "full_name", "district", "taluka", "address")
+    list_display = ("date_joined","last_login","is_admin","is_staff", "mobile_no", "email", "first_name", "middle_name", "last_name", "district", "taluka", "address")
     search_fields = ("email", "mobile_no")
     readonly_fields = ("date_joined","last_login")
     filter_horizontal = ()
@@ -111,16 +111,16 @@ class PublisherAccount(UserAdmin):
     ordering = ('mobile_no', "email")
     fieldsets = (
             (None, {'fields' : ('password', "mobile_no", "email")}),
-                ('Personal Info', {"fields": ("full_name", "district", "taluka", "address")}),
+                ('Personal Info', {"fields": ("first_name", "middle_name", "last_name", "district", "taluka", "address")}),
                 ("Permissions", {"fields": ("is_admin", "is_staff","is_superuser", "is_active", "is_user_admin", "is_marketer", "is_publisher", "is_accountant")}),
             )
     add_fieldsets = UserAdmin.add_fieldsets +  (
-                (None, {'fields' : ("mobile_no", "email", "full_name", "district", "taluka", "address", "is_user_admin", "is_marketer", "is_publisher", "is_accountant")}),
+                (None, {'fields' : ("mobile_no", "email", "first_name", "middle_name", "last_name", "district", "taluka", "address", "is_user_admin", "is_marketer", "is_publisher", "is_accountant")}),
             )
 
 
 class AccountantAccount(UserAdmin):
-    list_display = ("date_joined","last_login","is_admin","is_staff", "mobile_no", "email", "full_name", "district", "taluka", "address")
+    list_display = ("date_joined","last_login","is_admin","is_staff", "mobile_no", "email", "first_name", "middle_name", "last_name", "district", "taluka", "address")
     search_fields = ("email", "mobile_no")
     readonly_fields = ("date_joined","last_login")
     filter_horizontal = ()
@@ -128,11 +128,11 @@ class AccountantAccount(UserAdmin):
     ordering = ('mobile_no', "email")
     fieldsets = (
             (None, {'fields' : ('password', "mobile_no", "email")}),
-                ('Personal Info', {"fields": ("full_name", "district", "taluka", "address")}),
+                ('Personal Info', {"fields": ("first_name", "middle_name", "last_name", "district", "taluka", "address")}),
                 ("Permissions", {"fields": ("is_admin", "is_staff","is_superuser", "is_active", "is_user_admin", "is_marketer", "is_publisher", "is_accountant" )}),
             )
     add_fieldsets = UserAdmin.add_fieldsets +  (
-                (None, {'fields' : ("mobile_no", "email", "full_name", "district", "taluka", "address", "is_user_admin", "is_marketer", "is_publisher", "is_accountant")}),
+                (None, {'fields' : ("mobile_no", "email", "first_name", "middle_name", "last_name", "district", "taluka", "address", "is_user_admin", "is_marketer", "is_publisher", "is_accountant")}),
             )
 
 
@@ -145,8 +145,16 @@ admin.site.register(Marketer, MarketerAccount)
 admin.site.register(Publisher, PublisherAccount)
 admin.site.register(Accountant, AccountantAccount)
 
+class OrderAdmin(admin.ModelAdmin):
+    list_display = ["id", "order_id", "client_id", "bill_status", "total_bill_amt", "order_status", "signed_release_order"]
+    list_filter = ("client_id", )
 
-admin.site.register(Order)
+class AdvtAdmin(admin.ModelAdmin):
+    list_display = ["id", "is_published", "order_id"]
+    list_filter = ("is_published", )
+
+
+admin.site.register(Order, OrderAdmin)
 admin.site.register(Client)
-admin.site.register(Advt)
+admin.site.register(Advt, AdvtAdmin)
 admin.site.register(AdType)

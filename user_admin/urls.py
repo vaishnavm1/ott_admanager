@@ -11,6 +11,13 @@ urlpatterns = [
 
     path('home/', views.user_admin_home, name="user_admin_home"),
     path("view-posts/", views.view_posts, name="view_posts"),
+ 
+    # Search Orders
+    path("search-orders/", views.user_admin_search_orders, name="user_admin_search_orders"),
+
+    # Search Marketer's Clients
+    path("marketer/clients-search/", views.search_marketers_clients, name="search_marketers_clients"),
+
 ]
 
 from django.conf import settings

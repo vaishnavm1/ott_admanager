@@ -1,0 +1,407 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Accountant Home</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-0evHe/X+R7YkIZDRvuzKMRqM+OrBnVFBL6DOitfPri4tjfHxaWutUpFmBp4vmVor" crossorigin="anonymous">
+    <!-- <link rel="stylesheet" href="{% static "assets/css/style.css" %}" /> -->
+    <!-- CSS only -->
+
+    <style>
+      .datetime-boxes input{
+        display: flex;
+        margin: 10px 0;
+        /* margin: 10px 0; */
+      }
+      #cartTotal{
+        background-color: red;
+        color: white;
+        margin-left: 5px;
+        border-radius: 10px;
+        padding: 5px;
+      }
+      @media only screen and (min-width: 600px) {
+        #logoutBtn{
+          position: absolute;
+          right: 10px;
+          top:10;
+        }
+        #myDropdown{
+          position: absolute;
+          right: 10vw;
+          top:10px;
+          
+        }
+      }
+      #ad-seprator{
+        border: 1px solid rgb(175, 175, 175);
+        margin: 0 20px;
+      }
+      #ad-seprator:last-child{
+        display: none;
+      }
+
+      #myImg {
+        border-radius: 5px;
+        cursor: pointer;
+        transition: 0.3s;
+      }
+      
+      #myImg:hover {opacity: 0.7;}
+      
+      /* The Modal (background) */
+      .modalz {
+        display: none; /* Hidden by default */
+        position: fixed; /* Stay in place */
+        z-index: 1; /* Sit on top */
+        padding-top: 100px; /* Location of the box */
+        left: 0;
+        top: 0;
+        width: 100%; /* Full width */
+        height: 100%; /* Full height */
+        overflow: auto; /* Enable scroll if needed */
+        background-color: rgb(0,0,0); /* Fallback color */
+        background-color: rgba(0,0,0,0.9); /* Black w/ opacity */
+      }
+      
+      /* Modal Content (image) */
+      .modalz-content {
+        margin: auto;
+        display: block;
+        width: 80%;
+        max-width: 700px;
+      }
+      
+      /* Caption of Modal Image */
+      #caption {
+        margin: auto;
+        display: block;
+        width: 80%;
+        max-width: 700px;
+        text-align: center;
+        color: #ccc;
+        padding: 10px 0;
+        height: 150px;
+      }
+      
+      /* Add Animation */
+      .modalz-content, #caption {  
+        -webkit-animation-name: zoom;
+        -webkit-animation-duration: 0.6s;
+        animation-name: zoom;
+        animation-duration: 0.6s;
+      }
+      
+      @-webkit-keyframes zoom {
+        from {-webkit-transform:scale(0)} 
+        to {-webkit-transform:scale(1)}
+      }
+      
+      @keyframes zoom {
+        from {transform:scale(0)} 
+        to {transform:scale(1)}
+      }
+      
+      /* The Close Button */
+      .close {
+        position: absolute;
+        top: 15px;
+        right: 35px;
+        color: #f1f1f1;
+        font-size: 40px;
+        font-weight: bold;
+        transition: 0.3s;
+      }
+      
+      .close:hover,
+      .close:focus {
+        color: #bbb;
+        text-decoration: none;
+        cursor: pointer;
+      }
+      
+      /* 100% Image Width on Smaller Screens */
+      @media only screen and (max-width: 700px){
+        .modalz-content {
+          width: 100%;
+        }
+      }
+
+
+    </style>
+</head>
+<body>
+
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="#">OTT Media</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        
+        
+
+        {% comment %} <form class="d-flex" role="search">
+          <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
+          <button class="btn btn-outline-success" type="submit">Search</button>
+        </form>  {% endcomment %}
+
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+          {% comment %} <li class="nav-item">
+            <a class="nav-link active" aria-current="page" href="#">Home</a>
+          </li> {% endcomment %}
+          
+          <li class="nav-item dropdown" id="myDropdown">
+            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+              Hi {{ request.user.first_name }}
+            </a>
+            <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+              <li><a class="dropdown-item" href="#">Manage Account</a></li>
+              {% comment %} <li><hr class="dropdown-divider"></li> {% endcomment %}
+              <li><a class="dropdown-item" href="#">Logout</a></li>
+            </ul>
+          </li>
+          
+        </ul> 
+        {% comment %} <a href="logout.php" class="btn btn-outline-success" id="logoutBtn">Logout</a> {% endcomment %}
+        
+        
+
+      </div>
+    </div>
+  </nav>
+
+  <div class="container my-3">
+    <div class="row gx-5">
+        <div class="col">
+          <div class="p-3 border bg-light">
+            <h3> 
+              There are total <b> <span id="totalAds">{{ order.advt_set.all|length }}<span> Ad(s) </b> in the order of Client <b>{{ order.client_id.name }}</b>
+                Marketer : <b>{{ order.marketer_id }}</b>
+            </h3>
+          </div>
+        </div>
+      </div>
+
+    <div class="accordion mt-3" id="accordionPanelsStayOpenExample">
+      <div class="accordion-item">
+        <h2 class="accordion-header" id="headingOne">
+          <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+           <b>Click here to view Ads in the order </b>
+          </button>
+        </h2>
+      {% for ad in order.advt_set.all %}
+        <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#accordionExample">
+          <div class="accordion-body">
+            <div class="ad-container" data-id="{{ ad.id }}">
+              <h6>Ad Type : <b>{{ ad.type.title }}</b> <br><h6>
+              <h6>Ad Amount : <b>₹ {{ ad.type.rate }}</b> <br></h6>
+              <h6>Publishing On : <b>{{ ad.ad_pub_date }}</b></h6>
+              <a href="#" id="myImg" data-src='{{ ad.ad_image.url }}'>View Image</a>
+              <p></p>
+            </div>
+            {% comment %} <strong>This is the first item's accordion body.</strong> It is shown by default, until the collapse plugin adds the appropriate classes that we use to style each element. These classes control the overall appearance, as well as the showing and hiding via CSS transitions. You can modify any of this with custom CSS or overriding our default variables. It's also worth noting that just about any HTML can go within the <code>.accordion-body</code>, though the transition does limit overflow. {% endcomment %}
+          </div>
+        </div>
+        <hr id="ad-seprator">
+      {% endfor %}
+    </div> {% comment %} END Accordian {% endcomment %}
+
+    <div class="row gx-5 mt-3">
+      <div class="col">
+        <div class="p-3 border bg-light">
+          <h3>
+            Total Bill value : 
+            <span id="totalBillAmt">{{ order.total_bill_amt }} </span> 
+            {{ order.order_status }}
+          </h3>
+        </div>
+      </div>
+    </div>
+       
+    {% if orderviewform %}
+      <div class="row">
+        <div class="form-group col-md-6">
+          <label for="modeOfPayment">{{ orderviewform.mode_of_pay.label }}</label>
+          {{ orderviewform.mode_of_pay }}
+        </div>
+        <div class="form-group col-md-6">
+          <label for="transaction_id">{{ orderviewform.trans_id.label }}</label>
+          {{ orderviewform.trans_id }}
+                   
+        </div>
+
+        </div>  
+      </div>
+    
+      {% endif %}
+      
+      <h4 class="mt-2">Payment Status: {{ order.order_status }}</h4>
+      {% if order.signed_release_order %}
+      <div>
+        Client Signed RO was uploaded : <a href="#" id="myImg" data-src='{{ order.signed_release_order.url }}'>View RO</a>
+      </div>
+      {% else %}
+      <div>
+        Client Signed RO is not yet uploaded by marketer
+      </div>
+      {% endif %}
+      {% if order.order_status == 'In Review' %}
+      
+      
+      <div class="mt-4" style="display: flex; justify-content: space-between;">
+        <button class="btn btn-success" id="cofirmPaymentBtn">Confirm Payment Received</button>
+        <button class="btn btn-danger" id="declinePaymentBtn">Decline Payment Received</button>
+      </div>
+      {% else %}
+
+      
+
+      <a href="{% url 'accountant_generate_order_bill' order.order_id %}" class="btn btn-lg btn-warning mt-5">Generate Bill</a>
+      <h3>Client email : {{ order.client_id.email }}</h3>
+          {% if order.order_status == order.Status.REJECTED %}
+          <div class="mt-2">
+            <p>Do you want to confirm the payment request now?</p>
+            <button class="btn btn-success" id="cofirmPaymentBtn">Confirm Payment Now</button>
+          </div>
+          {% endif %}
+      {% endif %}
+      
+  </div>
+  <div id="myModal" class="modalz">
+    <span class="close">&times;</span>
+    <img class="modalz-content" id="img01">
+    <div id="captionz"></div>
+  </div>
+  
+    {% comment %} <script src="{% static "assets/js/util.js" %} "></script>
+    <script src="{% static "assets/js/menu-aim.js" %} "></script>
+    <script src="{% static "assets/js/main.js" %} "></script> {% endcomment %}
+
+    <!-- JavaScript Bundle with Popper -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js" integrity="sha384-pprn3073KE6tl6bjs2QrFaJGz5/SUsLqktiwsUTF55Jfv3qYSDhgCecCxMW52nD2" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+<script>
+    
+    
+  let cofirmPaymentBtn = null;
+    if(document.getElementById("cofirmPaymentBtn")){
+      cofirmPaymentBtn = document.getElementById("cofirmPaymentBtn");
+      cofirmPaymentBtn.onclick = function(){
+        let order_id = `{{ order.order_id }}`;
+        swal({
+                title: "Confirm",
+                text: "Do you really cofirm the payment has been received?",
+                icon: "warning",
+                buttons: true,
+                dangerMode: true,
+            })
+            .then( willDelete => {
+              if(willDelete){
+                let url = `{% url 'accountant_confirm_payment' %}`;
+                let token = `{{ csrf_token }}`;
+  
+                let postData = new FormData();
+                postData.append("order_id", order_id);
+                postData.append("csrfmiddlewaretoken", token);
+                console.log(order_id);
+  
+                fetch(url, {
+                  method : "POST",
+                  body : postData
+                })
+                .then(res =>{
+                  return res.json()
+                })
+                .then(data => {
+                  let msg = data['msg'];
+                  if(data["result"]){
+                    swal(msg, {
+                    icon: "success",
+                    })
+                    .then( value => {
+                        window.location.reload();
+                    })
+                  }
+                  else{
+                    swal(msg, {
+                    icon: "error",
+                    })
+                  }
+                })
+              }
+            })
+          }
+        }
+
+          if(document.getElementById("declinePaymentBtn")){
+            let declinePaymentBtn = document.getElementById("declinePaymentBtn");
+            declinePaymentBtn.onclick = function(){
+              swal({
+                      title: "Confirm",
+                      text: "Do you really confirm payment has NOT received?",
+                      icon: "warning",
+                      buttons: true,
+                      dangerMode: true,
+                  })
+                  .then( willDelete => {
+                        if(willDelete){
+                          let msg = data['msg'];
+                        if(data["result"]){
+                          swal(msg, {
+                          icon: "success",
+                          })
+                          .then( value => {
+                              window.location.reload();
+                          })
+                        }
+                        else{
+                          swal(msg, {
+                          icon: "error",
+                          })
+                        }                    
+                      } 
+                  })
+                }
+          }
+          
+           
+    
+    
+    {% comment %} let declinePaymentBtn = document.getElementById("declinePaymentBtn"); {% endcomment %}
+    
+        
+        
+        
+        
+  var modal = document.getElementById("myModal");
+
+// Get the image and insert it inside the modal - use its "alt" text as a caption
+var imgs = document.querySelectorAll("#myImg");
+var modalImg = document.getElementById("img01");
+var captionText = document.getElementById("captionz");
+imgs.forEach( (img)=>{
+  
+  img.onclick = function(){
+    modal.style.display = "block";
+    modalImg.src = this.dataset.src;
+    captionText.innerHTML = this.dataset.alt;
+  }
+
+})
+
+// Get the <span> element that closes the modal
+var span = document.getElementsByClassName("close")[0];
+
+// When the user clicks on <span> (x), close the modal
+span.onclick = function() { 
+  modal.style.display = "none";
+}
+
+</script>
+</body>
+</html>

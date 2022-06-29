@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title></title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@300&display=swap');
+        *{
+            /* font-family: "Times New Roman", Times, serif; */
+            font-family: 'Open Sans', sans-serif;
+            /* letter-spacing: 2px; */
+
+        }
+        .container{
+            width: 800px;
+            margin: 0 auto;
+        }
+
+        
+        </style>
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-0evHe/X+R7YkIZDRvuzKMRqM+OrBnVFBL6DOitfPri4tjfHxaWutUpFmBp4vmVor" crossorigin="anonymous">
+</head>
+<body>
+    <div class="container">
+        <center><h1><i>OnThisTime Media Pvt Ltd</i></h1></center>
+        <center><h3>Release Order (RO)</h3></center>
+        <br>
+        <div class="agreement-container">
+            <p>I <b>{{ client_name }}</b> hearby give full permission to publish following advertisement/advertisements on On This Time Media Pvt Ltd</p>
+            <p>I agree to all the terms and conditions laid down by On This Time Media Pvt Ltd Ahmednagar</p>
+            <hr>
+            <p>Following are the advertisements</p>
+            <table class="table table-bordered text-center">
+                <thead class="table-light">
+                  <tr>
+                    <th scope="col">Ad Number</th>
+                    <th scope="col">Ad Type</th>
+                    <th scope="col">Ad Rate</th>
+                    <th scope="col">Ad Publishing Date</th>
+                  </tr>
+                </thead>
+                <tbody class="table-group-divider">
+                    {% comment %} {% set count = 1 %} {% endcomment %}
+                    {%for advt in order.advt_set.all %}
+                        <tr>
+                            <th scope="row">{{ forloop.counter }}</th>
+                            <td>{{ advt.type.title }}</td>
+                            <td>{{ advt.type.rate }}</td>
+                            <td>{{ advt.ad_pub_date }}</td>
+                        </tr>
+                    {% endfor %}
+                   
+               
+                </tbody>
+              </table>
+              <div class="client-sign">
+                <h3>Client Signature</h3>
+                <br><br>
+                <h3>Marketer Signature</h3>
+              </div>
+        </div>
+
+    </div>
+</body>
+</html>

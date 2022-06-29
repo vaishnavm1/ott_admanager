@@ -61,6 +61,7 @@ INSTALLED_APPS = [
 
 
     "django_hosts",
+    "crispy_forms",
 ]
 
 MIDDLEWARE = [
@@ -230,4 +231,4 @@ AWS_QUERYSTRING_EXPIRE = 100
 
 AWS_S3_REGION_NAME = "ap-south-1"
 
-
+CRISPY_TEMPLATE_PACK = 'bootstrap4'

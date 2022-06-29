@@ -1,12 +1,15 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponse, JsonResponse
 from .forms import *
-from .models import Post
+from .models import Post, Marketer, Order
+from django.template.loader import render_to_string
 
 
 from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib import messages
+
+from datetime import datetime, timedelta
 
 from .decorators import should_be_user_admin
 
@@ -27,8 +30,11 @@ def user_admin_login(request):
                 print("User is admin")
                 login(request, user)
                 return redirect("user_admin_home")
+            else:
+                messages.add_message(request, messages.ERROR, "Invalid username/password")
+                return redirect("user_admin_login")
+
         else:
-            print("Form invalid")
             messages.add_message(request, messages.ERROR, "Invalid username/password")
             return redirect("user_admin_login")
     else:
@@ -39,7 +45,14 @@ def user_admin_login(request):
 
 @should_be_user_admin()
 def user_admin_home(request):
-    return render(request, "user_admin/user_admin_home.html")
+    context = {}
+    marketers = Marketer.objects.all()
+    clients = Client.objects.all()
+    context = {
+        "marketers": marketers,
+        "clients": clients
+    }
+    return render(request, "user_admin/user_admin_home.html", context)
 
 
 @should_be_user_admin()
@@ -47,7 +60,46 @@ def user_admin_logout(request):
     logout(request)
     return redirect("user_admin_login")
 
+@should_be_user_admin()
+def user_admin_search_orders(request):
+    response = {}
+    context = {}
+    start_date = request.POST.get("start_date_time")
+    end_date = request.POST.get("end_date_time")
+    marketer_id = request.POST.get("marketer_id")
+    client_id = request.POST.get("client_id")
+    
+    
+    start_date_obj = datetime.strptime(start_date, '%Y-%m-%d %I:%M%p')
+    end_date_obj = datetime.strptime(end_date, '%Y-%m-%d %I:%M%p')
+    if marketer_id != "0":
+        marketer = get_object_or_404(Marketer, id=marketer_id)
+        queryset_orders = Order.objects.filter(marketer_id=marketer).exclude(order_status=Order.Status.FRESH)
+    else:
+        queryset_orders = Order.objects.all().exclude(order_status=Order.Status.FRESH)
+    
+    if client_id != "0":
+        client = get_object_or_404(Client, id=client_id)
+        queryset_orders = queryset_orders.filter(client_id = client)
 
+    
+
+    queryset_orders = queryset_orders.filter(created__gte=start_date_obj, created__lte=end_date_obj)
+
+    context["orders"] = queryset_orders
+    html = render_to_string("user_admin/view_orders.html", context, request=request)
+
+    return JsonResponse({"html": html})
+
+@should_be_user_admin()
+def search_marketers_clients(request):
+    context = {}
+    marketer_id = request.POST.get("m_id")
+    marketer = get_object_or_404(Marketer, id=marketer_id)
+    queryset = Client.objects.filter(marketer_id=marketer)
+    context["talukas"] = queryset
+    html = render_to_string("user_admin/tagify_clients.html", context, request=request)
+    return JsonResponse({"form":html,"clients": list(queryset.values())})
 
 # Old
 # def user_admin_home(request):

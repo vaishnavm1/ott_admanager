@@ -1,0 +1,128 @@
+{% load crispy_forms_tags %}
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Accountant Add Marketer</title>
+    <link rel="stylesheet" href="{% static "assets/css/style.css" %}" />
+    <style>
+        .my-btn{
+            background: #0B5ED7;
+            color: white;
+            border: none;
+            padding: 5px;
+            border-radius: 3px;
+            transition-duration: 300ms;
+          }
+          .my-btn:hover{
+            background: #094db3;
+          }
+    </style>
+</head>
+<body>
+    <header class="cd-main-header js-cd-main-header">
+        <div class="cd-logo-wrapper">
+          <a href="#0" class="cd-logo">
+            <span style="color: white;">OTT Media</span>
+          </a>
+          <!-- <a href="#" class="cd-logo">OTT</a> -->
+        </div>
+        
+        <div class="cd-reset js-cd-search">
+          <form>
+            <!-- <input class="reset" type="search" placeholder="Search..."> -->
+          </form>
+        </div>
+      
+        <button class="reset cd-nav-trigger js-cd-nav-trigger" aria-label="Toggle menu"><span></span></button>
+      
+        <ul class="cd-nav__list js-cd-nav__list">
+          {% comment %} <li class="cd-nav__item"><a href="#0">Tour</a></li>
+          <li class="cd-nav__item"><a href="#0">Support</a></li> {% endcomment %}
+          <li class="cd-nav__item cd-nav__item--has-children cd-nav__item--account js-cd-item--has-children">
+            <a href="#0">
+              {% comment %} <img src="https://svgshare.com/i/iPh.svg" alt="avatar"> {% endcomment %}
+              <span>Hi {{ request.user.first_name }}</span>
+            </a>
+        
+            <ul class="cd-nav__sub-list">
+              {% comment %} <li class="cd-nav__sub-item"><a href="#0">My Account</a></li>
+              <li class="cd-nav__sub-item"><a href="#0">Edit Account</a></li> {% endcomment %}
+              <li class="cd-nav__sub-item"><a href="#0">Logout</a></li>
+            </ul>
+          </li>
+        </ul>
+      </header> <!-- .cd-main-header -->
+      
+      <main class="cd-main-content">
+        <nav class="cd-side-nav js-cd-side-nav">
+          <ul class="cd-side__list js-cd-side__list">
+            <li class="cd-side__label"><span>Main</span></li>
+            {% comment %} <li class="cd-side__item cd-side__item--has-children cd-side__item--overview js-cd-item--has-children">
+              <a href="#0">Overview</a>
+              
+              <ul class="cd-side__sub-list">
+                <li class="cd-side__sub-item"><a href="#0">All Data</a></li>
+                <li class="cd-side__sub-item"><a href="#0">Category 1</a></li>
+                <li class="cd-side__sub-item"><a href="#0">Category 2</a></li>
+              </ul>
+            </li> {% endcomment %}
+    
+            <li class="cd-side__item cd-side__item--has-children cd-side__item--users cd-side__item--selected js-cd-item--has-children">
+              <a href="#0">Manage Marketers</a>
+              
+              <ul class="cd-side__sub-list">
+                <li class="cd-side__sub-item"><a aria-current="page" href="#0">Add Marketer</a></li>
+                {% comment %} <li class="cd-side__sub-item"><a href="#0">Edit Client</a></li> {% endcomment %}
+              </ul>
+            </li>
+            
+            <li class="cd-side__item cd-side__item--has-children cd-side__item--users js-cd-item--has-children">
+                <a href="#0">Manage Payment requests</a>
+                
+                <ul class="cd-side__sub-list">
+                  <li class="cd-side__sub-item"><a href="{% url 'accountant_view_ads' %}">View Pending Ads</a></li>
+                  {% comment %} <li class="cd-side__sub-item"><a href="#0">View Ads by Client</a></li> {% endcomment %}
+                </ul>
+              </li>
+           
+            
+          </ul>
+        
+           
+    
+             
+         
+        
+          
+        </nav>
+      
+        <div class="cd-content-wrapper">
+            {% if messages %}
+              {% for message in messages %}
+              
+                <b> {{ message }} </b>
+              {% endfor %}
+            {% endif %}
+            <h1>Add Marketer</h1>
+            <form method="POST" id="myForm">
+                {% csrf_token %}
+                {{ form|crispy }}
+                
+            <input type="submit" name="submit" value="Submit" id="submitBtn" class="my-btn" style="margin-top: 10px;">
+            </form>
+            
+        </div> <!-- .content-wrapper -->
+      </main> <!-- .cd-main-content -->
+
+    <script src="{% static "assets/js/util.js" %} "></script>
+    <script src="{% static "assets/js/menu-aim.js" %} "></script>
+    <script src="{% static "assets/js/main.js" %} "></script>
+    <script>
+        
+    </script>
+</body>
+</html>

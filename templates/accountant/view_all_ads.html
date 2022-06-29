@@ -1,0 +1,65 @@
+{% if orders %}
+<table class="fold-table">
+    <thead>
+      <tr>
+        <th>Total Ads in Order</th>
+        <th>Client Name</th>
+        <th>Marketer Name</th>
+        <th>Total Bill Amount</th>
+        <th>Bill Status</th>
+        <th>Ad created Date</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      
+        {% for order in orders %}
+        
+        <tr class="view">
+            <td>{{ order.advt_set.all|length }}</td>
+            <td>{{ order.client_id.name }}</td>
+            <td>{{ order.marketer_id.first_name }}</td>
+            <td>{{ order.total_bill_amt }}</td>
+            <td>{{ order.order_status }}</td>
+            <td>{{ order.created }}</td>
+            <td>
+                <a href="{% url 'accountant_edit_order' order.order_id %}">Edit Order</a>
+            </td>
+        </tr>
+        {% if order.advt_set.all|length > 0 %}
+      <tr class="fold">
+        <td colspan="7">
+          <div class="fold-content">
+            <!-- <h3>Company Name</h3> -->
+            <!-- <p>Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas.</p> -->
+            <p>Total Ads in this order are as follow: </p>
+            <table>
+              <thead style="font-weight: 600;">
+                <tr>
+                  <th>Ad Type</th>
+                  <th>Amount</th>
+                  <th>Ad Publishing Date</th>
+                </tr>
+              </thead>
+              <tbody>
+                  {% for advt in order.advt_set.all %}
+                  
+                    <tr>
+                        <td>{{ advt.type.title }}</td>
+                        <td>{{ advt.type.rate }}</td>
+                        <td>{{ advt.ad_pub_date }}</td>
+                    </tr>
+                {% endfor  %}
+                
+              </tbody>
+            </table>          
+          </div>
+        </td>
+      </tr>
+      {% endif %}
+      {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<h2>No Ads Found</h2>
+{% endif %}

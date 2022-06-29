@@ -1,0 +1,369 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Marketer Home</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-0evHe/X+R7YkIZDRvuzKMRqM+OrBnVFBL6DOitfPri4tjfHxaWutUpFmBp4vmVor" crossorigin="anonymous">
+    <!-- <link rel="stylesheet" href="{% static "assets/css/style.css" %}" /> -->
+    <!-- CSS only -->
+
+    <style>
+      .datetime-boxes input{
+        display: flex;
+        margin: 10px 0;
+        /* margin: 10px 0; */
+      }
+      #cartTotal{
+        background-color: red;
+        color: white;
+        margin-left: 5px;
+        border-radius: 10px;
+        padding: 5px;
+      }
+      @media only screen and (min-width: 600px) {
+        #logoutBtn{
+          position: absolute;
+          right: 10px;
+          top:10;
+        }
+        #myDropdown{
+          position: absolute;
+          right: 10vw;
+          top:10px;
+          
+        }
+      }
+      #ad-seprator{
+        border: 1px solid rgb(175, 175, 175);
+        margin: 0 20px;
+      }
+      #ad-seprator:last-child{
+        display: none;
+      }
+    </style>
+</head>
+<body>
+
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="#">OTT Media</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        
+        
+
+        {% comment %} <form class="d-flex" role="search">
+          <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
+          <button class="btn btn-outline-success" type="submit">Search</button>
+        </form>  {% endcomment %}
+
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+          {% comment %} <li class="nav-item">
+            <a class="nav-link active" aria-current="page" href="#">Home</a>
+          </li> {% endcomment %}
+          
+          <li class="nav-item dropdown" id="myDropdown">
+            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+              Hi {{ first_name }}
+            </a>
+            <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+              <li><a class="dropdown-item" href="#">Manage Account</a></li>
+              {% comment %} <li><hr class="dropdown-divider"></li> {% endcomment %}
+              <li><a class="dropdown-item" href="#">Logout</a></li>
+            </ul>
+          </li>
+          
+        </ul> 
+        {% comment %} <a href="logout.php" class="btn btn-outline-success" id="logoutBtn">Logout</a> {% endcomment %}
+        
+        
+
+      </div>
+    </div>
+  </nav>
+
+  <div class="container my-3">
+    <div class="row gx-5">
+        <div class="col">
+          <div class="p-3 border bg-light">
+            <h3>Welcome <b> {{ first_name }}</b> You have total <b> <span id="totalAds">{{ totalAds}}<span> Ad(s) </b> in your cart of Client <b>{{ client_name }}</b></h3>
+          </div>
+        </div>
+      </div>
+
+    {% if totalAds > 0%}
+    <div class="accordion mt-3" id="accordionPanelsStayOpenExample">
+      <div class="accordion-item">
+        <h2 class="accordion-header" id="headingOne">
+          <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+           <b>Click here to view Ads in the order </b>
+          </button>
+        </h2>
+      {% for ad in ads_obj %}
+        <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#accordionExample">
+          <div class="accordion-body">
+            <div class="ad-container" data-id="{{ ad.id }}">
+              <h6>Ad Type : <b>{{ ad.type.title }}</b> <br><h6>
+              <h6>Ad Amount : <b>₹ {{ ad.type.rate }}</b> <br></h6>
+              <h6>Publishing On : <b>{{ ad.ad_pub_date }}</b></h6>
+              {% if orderviewform %}
+                <button class="btn btn-outline-danger" disabled>Remove Ad</button>
+              {% else %}
+                <button class="btn btn-outline-danger" onclick="removeAdBtnEvent(this)">Remove Ad</button>
+              {% endif %}
+            </div>
+            {% comment %} <strong>This is the first item's accordion body.</strong> It is shown by default, until the collapse plugin adds the appropriate classes that we use to style each element. These classes control the overall appearance, as well as the showing and hiding via CSS transitions. You can modify any of this with custom CSS or overriding our default variables. It's also worth noting that just about any HTML can go within the <code>.accordion-body</code>, though the transition does limit overflow. {% endcomment %}
+          </div>
+        </div>
+        <hr id="ad-seprator">
+      {% endfor %}
+    </div> {% comment %} END Accordian {% endcomment %}
+
+    <div class="row gx-5 mt-3">
+      <div class="col">
+        <div class="p-3 border bg-light">
+          <h3>
+            Total Bill value : 
+            <span id="totalBillAmt">{{ order_obj.total_bill_amt }} </span> 
+            
+          </h3>
+        </div>
+      </div>
+    </div>
+    <a href="{% url 'generate_ro' '_' %}" class="btn btn-warning mt-4 mb-4" id="generateRoLink">Generate RO</a>
+    
+    {% if orderviewform %}
+      <div class="row">
+        <div class="form-group col-md-6">
+          <label for="modeOfPayment">{{ orderviewform.mode_of_pay.label }}</label>
+          {{ orderviewform.mode_of_pay }}
+        </div>
+        <div class="form-group col-md-6">
+          <label for="transaction_id">{{ orderviewform.trans_id.label }}</label>
+          {{ orderviewform.trans_id }}
+                   
+        </div>
+
+        </div>  
+      </div>
+      
+      
+
+      
+    {% else %}
+        <div class="row">
+          <div class="form-group col-md-6">
+            <label for="modeOfPayment">Select Mode Of Payment</label>
+            <select class="form-select" aria-label="Default select example" onchange="changeMopEvent(this)" id="modeOfPayment">
+              <option disabled="" selected="" value="0"> -- Select -- </option>
+                <option value="Cash">Cash</option>
+                <option value="Upi">UPI</option>
+                <option value="Cheque">Cheque</option>
+                <option value="Net-Banking">Net Banking</option>
+              </select>
+              <div id="modeOfPayment" class="invalid-feedback">
+                Please Select a Mode of Payment
+              </div>
+            </div>
+            <div class="form-group col-md-6" id="trans_id_box" style="display: none;">
+              <label for="transaction_id">Transaction ID</label>
+              <input type="text" class="form-control" id="transaction_id" placeholder="Enter Transaction ID" required="">
+              <div id="transaction_id" class="invalid-feedback">
+                Please enter the Transaction ID
+              </div>
+            </div>
+          </div>
+      {% endif %}
+
+
+      <br>
+      {% if orderviewform %}
+      <h3>To Edit Ad goto <b>Edit Ad</b> in previous menu</h3>
+      {% else %}
+      <button class="btn btn-lg btn-success" id="submitAdBtn">Submit Advt </button> <br><br>
+      {% endif %}
+    {% else %} 
+    {% comment %} Incase where Ads are 0 {% endcomment %}
+    
+    <svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+      <symbol id="info-fill" fill="currentColor" viewBox="0 0 16 16">
+        <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm.93-9.412-1 4.705c-.07.34.029.533.304.533.194 0 .487-.07.686-.246l-.088.416c-.287.346-.92.598-1.465.598-.703 0-1.002-.422-.808-1.319l.738-3.468c.064-.293.006-.399-.287-.47l-.451-.081.082-.381 2.29-.287zM8 5.5a1 1 0 1 1 0-2 1 1 0 0 1 0 2z"/>
+      </symbol>
+    </svg>
+    
+    <div class="alert alert-primary d-flex align-items-center mt-3" role="alert">
+      <svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="Info:"><use xlink:href="#info-fill"/></svg>
+      <div>
+        Add Ads to the cart to view ads here... 
+      </div>
+    </div>
+    
+    
+    {% endif %}
+    
+      <!-- <a class="btn btn-lg btn-warning" href="{% url 'generate_ro'  order_obj.order_id  %} ">Generate RO</a> -->
+
+      <br><br><br><br><br><br><br><br><br>
+  </div>
+  
+  
+    {% comment %} <script src="{% static "assets/js/util.js" %} "></script>
+    <script src="{% static "assets/js/menu-aim.js" %} "></script>
+    <script src="{% static "assets/js/main.js" %} "></script> {% endcomment %}
+
+    <!-- JavaScript Bundle with Popper -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js" integrity="sha384-pprn3073KE6tl6bjs2QrFaJGz5/SUsLqktiwsUTF55Jfv3qYSDhgCecCxMW52nD2" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+<script>
+
+  let order_id = localStorage.getItem("order_id");
+  let generate_ro_link = document.getElementById("generateRoLink");
+
+  let the_link = generate_ro_link.href;
+
+  let link_len = the_link.length;
+  link_len = link_len - 1; // Removing _ from last
+  let new_link = the_link.substring(0, link_len)
+  generate_ro_link.href = new_link;
+  generate_ro_link.href += order_id;
+
+  
+  if(document.getElementById("modeOfPayment").value != "cash"){
+    if(document.getElementById("trans_id_box")){
+      document.getElementById("trans_id_box").style.display = "block";
+    }
+  }
+  else{
+    if(document.getElementById("trans_id_box")){
+      document.getElementById("trans_id_box").style.display = "none";
+    }
+  }
+
+
+  function changeMopEvent(ele){
+    let value = ele.value;
+    if(value != "cash"){
+      document.getElementById("trans_id_box").style.display = "block";
+    }
+    else{
+      document.getElementById("trans_id_box").style.display = "none";
+      document.getElementById("transaction_id").value = "";
+    }
+  }
+
+  function removeAdBtnEvent(btn){
+    let advt_id = btn.parentElement.dataset.id;
+    let order_id = localStorage.getItem("order_id");
+    let url = "{% url 'delete_advt' %}";
+    let token = `{{ csrf_token }}`
+    let postData = new FormData();
+    postData.append("advt_id", advt_id);
+    postData.append("order_id", order_id);
+    postData.append("csrfmiddlewaretoken", token);
+    fetch(url, {
+      body: postData,
+      method : "POST"
+    })
+    .then(res => {
+      return res.json();
+    })
+    .then( data => {
+      console.log("Ad Deleted");
+      let lastAd = data["last_ad"];
+      if(lastAd){
+        btn.parentElement.parentElement.remove();
+        alert("Your cart is empty now...")
+        
+      }
+      else{
+        btn.parentElement.parentElement.remove();
+        let old_total_ads = `{{ totalAds}}`;
+        old_total_ads -= 1;
+        let new_bill_amt = data["new_total_bill_amt"];
+
+        document.getElementById("totalAds").innerText = old_total_ads;
+        document.getElementById("totalBillAmt").innerText = new_bill_amt;
+        
+
+      }
+    })
+  }
+
+  if(document.getElementById("submitAdBtn")){
+    let submitAdBtn = document.getElementById("submitAdBtn");
+    submitAdBtn.addEventListener("click", (e)=>{
+      if(document.getElementById("modeOfPayment").value != "cash" && document.getElementById("transaction_id").value == ""){
+        document.getElementById("transaction_id").classList.add("is-invalid");
+        return;
+      }
+      document.getElementById("transaction_id").classList.remove("is-invalid");
+      swal({
+              title: "Confirm",
+              text: "Are you sure?",
+              icon: "warning",
+              buttons: true,
+              dangerMode: true,
+          })
+          .then( willDelete => {
+            if(willDelete){
+              
+              let url = "{% url 'marketer_save_order' %}";
+              let modeOfPayment = document.getElementById("modeOfPayment").value;            
+              let transaction_id = document.getElementById("transaction_id").value;
+              let order_id = localStorage.getItem("order_id");
+              let token = `{{ csrf_token }}`
+  
+              
+              let postData = new FormData();
+              postData.append("order_id", order_id);
+              postData.append("mode_of_pay", modeOfPayment);
+              postData.append("transaction_id", transaction_id);
+              postData.append("csrfmiddlewaretoken", token);
+  
+              fetch(url, {
+                body: postData,
+                method : "POST"
+              })
+              .then(res => {
+                return res.json();
+              })
+              .then( data => {
+                console.log(data);
+                let result = data['result'];
+                let msg = data['msg'];
+                if(result){
+                  // swal({
+                  //     title: "Saved",
+                  //     text: msg,
+                  //     icon: "success",
+                  //     button: "OK"
+                  // });
+                  swal(msg, {
+                  icon: "success",
+                  })
+                  .then( value => {
+                      window.location.reload();
+                  })
+                }
+                else{
+                  swal({
+                      title: "Failure",
+                      text: msg,
+                      icon: "error",
+                      button: "OK"
+                  });
+                }
+              })
+            }
+          })
+      
+      })
+  }
+</script>
+</body>
+</html>

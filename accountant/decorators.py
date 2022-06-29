@@ -13,6 +13,7 @@ def should_be_accountant():
             password    =   request.user.password
             try:
                 accountant = Accountant.objects.get(email = email, password = password)
+                print("OkKKKK")
             except Accountant.DoesNotExist:
                 return redirect("accountant_login")
             return view_func(request, *args, **kwargs)

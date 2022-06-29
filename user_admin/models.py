@@ -74,7 +74,11 @@ class Account(AbstractBaseUser, PermissionsMixin):
     # Custom Fields
     mobile_no       =   models.CharField(max_length=20, unique = True)
 
-    full_name       =   models.CharField(max_length=200)
+    # full_name       =   models.CharField(max_length=200)
+    first_name      =   models.CharField(max_length=100)
+    middle_name     =   models.CharField(max_length=100)
+    last_name       =   models.CharField(max_length=100)
+
     district        =   models.CharField(max_length=100)
     taluka          =   models.CharField(max_length=100)
     address         =   models.TextField()
@@ -108,7 +112,7 @@ class Admin(Account):
 class Marketer(Account):
     pass
     def __str__(self):
-        return self.full_name
+        return f'{self.first_name} {self.middle_name} {self.last_name}'
     
 
 class Publisher(Account):
@@ -135,15 +139,38 @@ class Client(models.Model):
     def __str__(self):
         return self.name
     
-    
+import uuid    
 
 class Order(models.Model):
+
+    class Status(models.TextChoices):
+        IN_REVIEW = "In Review"
+        FRESH = "Fresh"
+        ACCEPTED = "Accepted"
+        REJECTED = "Rejected"
+    
+    class Mop(models.TextChoices):
+        CASH = "Cash"
+        UPI = "Upi"
+        CHEQUE = "Cheque"
+        NET_BANKING = "Net-Banking"
+        NONE = "None"
+
+    # ORDER_STATUS_CHOICES            =   (("In Review","In Review"), ("Fresh", "Fresh"), ("Accepted", "Accepted"), ("Rejected", "Rejected") )
+    # ORDER_MOP_CHOICES               =   (("cash", "Cash"), ("upi", "UPI"), ("cheque", "Cheque"), ("none", "None")) 
+
+    order_id                =   models.UUIDField(default=uuid.uuid4, editable=False)
+    
     client_id               =   models.ForeignKey(Client, on_delete = models.CASCADE)
     marketer_id             =   models.ForeignKey(Marketer, on_delete = models.CASCADE)
+
     bill_status             =   models.BooleanField(default = False)
-    total_bill_amt          =   models.IntegerField()
-    mode_of_pay             =   models.CharField(max_length=100)
-    trans_id                =   models.CharField(max_length=100)
+    order_status            =   models.CharField(max_length=100, choices=Status.choices, default = Status.FRESH)
+    
+    total_bill_amt          =   models.IntegerField(default = 0)
+    mode_of_pay             =   models.CharField(max_length=100, choices=Mop.choices, default = Mop.NONE)
+    trans_id                =   models.CharField(max_length=100, null = True, blank = True)
+    cheque_image            =   models.ImageField(upload_to="cheque-images", null=True, blank=True)
     bill_receipt            =   models.ImageField(upload_to="bill-receipts", null=True, blank=True)
     release_order           =   models.ImageField(upload_to="release-orders", null=True, blank=True)
     signed_release_order    =   models.ImageField(upload_to="signed-release-orders", null=True, blank=True)
@@ -157,18 +184,32 @@ class AdType(models.Model):
     title       =   models.CharField(max_length=100)
     rate        =   models.IntegerField()
     is_active   =   models.BooleanField(default = True, blank = True, null = True)
-    created =   models.DateTimeField(verbose_name="created", auto_now_add=True)
+    created =   models.DateTimeField(auto_now_add=True)
     def __str__(self):
-        return self.title
+        return f'{self.title} | {self.rate}'
 
 
 
 class Advt(models.Model):
-    desc                    =   models.TextField()
+    desc                    =   models.TextField(verbose_name="Ad Description")
     ad_image                =   models.ImageField(upload_to="ad-images", null = True, blank = True)
     type                    =   models.ForeignKey(AdType, on_delete=models.CASCADE)
 
-    order_id                =   models.ForeignKey(Order, on_delete=models.CASCADE, null = True, blank = True)
+    order_id                =   models.ForeignKey(Order, on_delete=models.CASCADE)
     
     ad_pub_date             =   models.DateTimeField()
     ad_pub_actual_date      =   models.DateTimeField(null = True, blank = True)
+    is_published            =   models.BooleanField(default = False)
+
+# class Advt(models.Model):
+#     desc                    =   models.TextField()
+#     ad_image                =   models.ImageField(upload_to="ad-images", null = True, blank = True)
+#     type                    =   models.ForeignKey(AdType, on_delete=models.CASCADE)
+#     marketer_id             =   models.ForeignKey(Marketer, on_delete=models.CASCADE, null=True, blank=True)
+#     client_id               =   models.ForeignKey(Client, on_delete=models.CASCADE, null=True, blank=True)
+
+#     # order_id                =   models.ForeignKey(Order, on_delete=models.CASCADE, null = True, blank = True)
+    
+#     ad_pub_date             =   models.DateTimeField()
+#     ad_pub_actual_date      =   models.DateTimeField(null = True, blank = True)
+

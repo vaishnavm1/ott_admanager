@@ -9,7 +9,6 @@ def should_be_publisher():
             if not request.user.is_authenticated:
                 # Redirect to publisher login page
                 return redirect("publisher_login")
-            print(f"User is Auth : {request.user.is_authenticated}")
             email       =   request.user.email
             password    =   request.user.password
             try:

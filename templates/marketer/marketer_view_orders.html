@@ -1,0 +1,375 @@
+{% load crispy_forms_tags %}
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Marketer Home</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-0evHe/X+R7YkIZDRvuzKMRqM+OrBnVFBL6DOitfPri4tjfHxaWutUpFmBp4vmVor" crossorigin="anonymous">
+    <link rel="stylesheet" href="{% static "assets/css/style.css" %}" />
+    <link rel="stylesheet" href="{% static "css/tagify.css" %}" />
+    <style>
+      .datetime-boxes input{
+        display: flex;
+        margin: 10px 0;
+        /* margin: 10px 0; */
+      }
+      #cartTotal{
+        background-color: red;
+        color: white;
+        margin-left: 5px;
+        border-radius: 10px;
+        padding: 5px;
+      }
+      .my-btn{
+          background: #0B5ED7;
+          color: white;
+          border: none;
+          padding: 5px;
+          border-radius: 3px;
+          transition-duration: 300ms;
+        }
+        .my-btn:hover{
+            background: #094db3;
+        }
+        .my-btn.success{
+            background: #157347;
+            transition-duration: 300ms;
+            padding: 10px 20px;
+        }
+        .my-btn.success:hover{
+            background: #105837;
+        }
+        #spinner-container{
+            width: 100%; height: 50vh; 
+            display: flex; justify-content: center; align-items: center;
+            position: absoute;
+            top:0px;
+        }
+        #spinner-container .spinner-border{
+            display: none;
+        }
+
+
+@import url("https://netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css");
+.pcs:after {
+  content: " pcs";
+}
+
+.cur:before {
+  content: "$";
+}
+
+.per:after {
+  content: "%";
+}
+
+      table {
+        width: 100%;
+      }
+      table th {
+        text-align: left;
+        border-bottom: 1px solid #ccc;
+      }
+      table th, table td {
+        padding: 0.4em;
+      }
+      
+      table.fold-table > tbody > tr.view td, table.fold-table > tbody > tr.view th {
+        cursor: pointer;
+      }
+      table.fold-table > tbody > tr.view td:first-child,
+      table.fold-table > tbody > tr.view th:first-child {
+        position: relative;
+        padding-left: 20px;
+      }
+      table.fold-table > tbody > tr.view td:first-child:before,
+      table.fold-table > tbody > tr.view th:first-child:before {
+        position: absolute;
+        top: 50%;
+        left: 5px;
+        width: 9px;
+        height: 16px;
+        margin-top: -8px;
+        font: 16px fontawesome;
+        color: #999;
+        {% comment %} content: "V"; {% endcomment %}
+        transition: all 500ms ease;
+      }
+      table.fold-table > tbody > tr.view:nth-child(4n-1) {
+        transition-duration: 500ms;
+        background: #eee;
+      }
+      table.fold-table > tbody > tr.view:hover {
+        background: rgb(102, 101, 101);
+        color: white;
+      }
+      table.fold-table > tbody > tr.view.open {
+        background: rgb(102, 101, 101);
+        /* background: tomato; */
+        color: white;
+      }
+      table.fold-table > tbody > tr.view.open td:first-child:before, table.fold-table > tbody > tr.view.open th:first-child:before {
+        transform: rotate(-180deg);
+        color: #333;
+      }
+      table.fold-table > tbody > tr.fold {
+        display: none;
+      }
+      table.fold-table > tbody > tr.fold.open {
+        display: table-row;
+      }
+      
+      .fold-content {
+        padding: 0.5em;
+      }
+      .fold-content h3 {
+        margin-top: 0;
+      }
+      .fold-content > table {
+        border: 2px solid #ccc;
+      }
+      .fold-content > table > tbody tr:nth-child(even) {
+        background: #eee;
+      }
+
+
+    </style>
+</head>
+<body>
+    <header class="cd-main-header js-cd-main-header">
+        <div class="cd-logo-wrapper">
+          <a href="#0" class="cd-logo"><img src="assets/img/cd-logo.svg" alt="OTT Logo"></a>
+          <!-- <a href="#" class="cd-logo">OTT</a> -->
+        </div>
+        
+        <div class="cd-reset js-cd-search">
+          <form>
+            <!-- <input class="reset" type="search" placeholder="Search..."> -->
+          </form>
+        </div>
+      
+        <button class="reset cd-nav-trigger js-cd-nav-trigger" aria-label="Toggle menu"><span></span></button>
+      
+        <ul class="cd-nav__list js-cd-nav__list">
+          {% comment %} <li class="cd-nav__item"><a href="{% url 'marketer_view_cart' 'order_id'  %}" id="viewCartLink">View Cart <span id="cartTotal"> {{ totalAds }} </span> </a></li> {% endcomment %}
+          {% comment %} <li class="cd-nav__item"><a href="#0">Support</a></li> {% endcomment %}
+          <li class="cd-nav__item cd-nav__item--has-children cd-nav__item--account js-cd-item--has-children">
+            <a href="#0">
+              <!-- <img src="https://svgshare.com/i/iPh.svg" alt="avatar"> -->
+              <span>Hi {{ name }}</span>
+            </a>
+        
+            <ul class="cd-nav__sub-list">
+              <li class="cd-nav__sub-item"><a href="#0">My Account</a></li>
+              <li class="cd-nav__sub-item"><a href="#0">Edit Account</a></li>
+              <li class="cd-nav__sub-item"><a href="{% url 'marketer_logout' %}">Logout</a></li>
+            </ul>
+          </li>
+        </ul>
+      </header> <!-- .cd-main-header -->
+      
+      <main class="cd-main-content">
+        <nav class="cd-side-nav js-cd-side-nav">
+          <ul class="cd-side__list js-cd-side__list">
+            <li class="cd-side__label"><span>Main</span></li>
+            {% comment %} <li class="cd-side__item cd-side__item--has-children cd-side__item--overview js-cd-item--has-children">
+              <a href="#0">Overview</a>
+              
+              <ul class="cd-side__sub-list">
+                <li class="cd-side__sub-item"><a href="#0">All Data</a></li>
+                <li class="cd-side__sub-item"><a href="#0">Category 1</a></li>
+                <li class="cd-side__sub-item"><a href="#0">Category 2</a></li>
+              </ul>
+            </li> {% endcomment %}
+    
+            <li class="cd-side__item cd-side__item--has-children cd-side__item--users js-cd-item--has-children">
+              <a href="#0">My Clients</a>
+              
+              <ul class="cd-side__sub-list">
+                <li class="cd-side__sub-item"><a href="#0">Add Client</a></li>
+                <li class="cd-side__sub-item"><a href="#0">Edit Client</a></li>
+              </ul>
+            </li>
+            
+            {% comment %} <li class="cd-side__item cd-side__item--has-children cd-side__item--comments  js-cd-item--has-children">
+                <a href="#0">Comments</a>
+                
+                <ul class="cd-side__sub-list">
+                    <li class="cd-side__sub-item"><a  href="#0">All Comments</a></li>
+                    <li class="cd-side__sub-item"><a href="#0">Edit Comment</a></li>
+                    <li class="cd-side__sub-item"><a href="#0">Delete Comment</a></li>
+                </ul>
+            </li> {% endcomment %}
+            <li class="cd-side__item cd-side__item--has-children cd-side__item--users cd-side__item--selected js-cd-item--has-children">
+              <a href="#">Manage My Ads</a>
+              
+              <ul class="cd-side__sub-list">
+                <li class="cd-side__sub-item"><a href="#0">Add Ad</a></li>
+                <li class="cd-side__sub-item"><a aria-current="page" href="#0">Update Ad <span class="cd-count">{{ unsigned_orders }}</span></a></li>
+                
+              </ul>
+            </li>
+          </ul>
+          
+        </nav>
+        <div class="cd-content-wrapper" style="margin-top:-9vh;">
+            <h1>Edit Orders  & RO</h1><h4>(You can only edit un-published ads)</h4>
+            <div class="row mt-2">
+                <div class="form-group col-md-8">
+                    <label for="clients_tags">By Clients</label>
+                    <textarea id="clients_tags"></textarea>
+                    <div class="invalid-feedback" id="clients_tags">
+                      Please select one client
+                    </div>
+                </div>
+                <div class="form-group col-md-1 mt-3">
+                  <div class="form-check">
+                    <input class="form-check-input" id="checkbox1" onchange="check1Changed(this)" type="checkbox" value="" id="flexCheckChecked" checked>
+                    <label class="form-check-label" for="flexCheckChecked">
+                      Show Confirmed Payments Orders
+                    </label>
+                  </div>
+                </div>
+                <div class="form-group col-md-1 mt-3" id="pendingBox">
+                  <div class="form-check">
+                    <input class="form-check-input" id="pendingCheckbox" type="checkbox" value="" id="flexCheckChecked" checked>
+                    <label class="form-check-label" for="flexCheckChecked">
+                      Pending Orders (RO upload remaining)
+                    </label>
+                  </div>
+                </div>
+                <div class="form-group col-md-2">
+                    <button class="btn mt-4" id="searchBtn" style="background-color: #157347; color: white;" type="button">
+                        Search
+                    </button>
+                </div>
+            </div>  
+            <div class="search-container">
+              {% comment %} <div class="" id="spinner-container" style="">
+                <div class="spinner-border" role="status" style="width: 100px; height: 100px; font-size: 1.4rem;">
+                  <span class="visually-hidden">Loading...</span>
+                </div>
+              </div> {% endcomment %}
+              <div class="search-result" style="height: 450px; overflow: auto; margin-top: 3vh;">
+                
+              </div>
+            </div>
+        </div> <!-- .content-wrapper -->
+</main> <!-- .cd-main-content -->
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js" integrity="sha384-pprn3073KE6tl6bjs2QrFaJGz5/SUsLqktiwsUTF55Jfv3qYSDhgCecCxMW52nD2" crossorigin="anonymous"></script>
+    <script src="{% static "assets/js/util.js" %} "></script>
+    <script src="{% static "assets/js/menu-aim.js" %} "></script>
+    <script src="{% static "assets/js/main.js" %} "></script>
+
+    <script src="{% static "js/tagify.min.js" %} "></script>
+
+    <script>
+
+      function check1Changed(ele){
+        if(ele.checked){
+          document.getElementById("pendingBox").style.display = "block";
+          document.getElementById("pendingCheckbox").checked = true;
+          
+        }
+        else{
+          document.getElementById("pendingBox").style.display = "none";
+          document.getElementById("pendingCheckbox").checked = false;
+          
+        }
+      }
+      
+
+        let searchBtn = document.getElementById("searchBtn");
+        searchBtn.addEventListener("click", (e)=>{
+          
+          {% comment %} document.querySelector("#spinner-container .spinner-border").style.display = "block"; {% endcomment %}
+
+          {% comment %} if(tagify_clients.value.length < 1){
+            document.querySelector("#clients_tags").classList.add('is-invalid');
+            return;
+          } {% endcomment %}
+
+          let client_id = 0;
+          
+          if(tagify_clients.value.length > 0){
+            client_id = tagify_clients.value[0]['id'];
+          }
+          let checkbox_value = document.getElementById("checkbox1").checked;
+
+          let pending_checkbox_value = document.getElementById("pendingCheckbox").checked;
+
+
+          
+          searchBtn.disabled = true;
+          searchBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Searching... ';
+          let url = `{% url "marketer_search_order" %}`;
+          let token = `{{ csrf_token }}`;
+
+
+          let postData = new FormData();
+          postData.append("csrfmiddlewaretoken", token);
+          postData.append("client_id", client_id);
+          postData.append("checkbox_value", checkbox_value);
+          postData.append("pending_check_value", pending_checkbox_value);
+
+          fetch(url, {
+            body: postData,
+            method : "POST"
+          })
+          .then(res => {
+            return res.json();
+          })
+          .then( data => {
+            {% comment %} document.querySelector("#spinner-container .spinner-border").style.display = "none"; {% endcomment %}
+            searchBtn.disabled = false;
+            searchBtn.innerHTML = 'Search';
+            let html = data['html'];
+            document.querySelector(".search-result").innerHTML = html;
+
+              $(function(){
+                $(".fold-table tr.view").on("click", function(){
+                  $(this).toggleClass("open").next(".fold").toggleClass("open");
+                });
+              });
+ 
+          })
+      })
+
+        let clients_obj = `{{ clients }}`;
+        var input_clients = document.querySelector("#clients_tags");
+        var tagify_clients = new Tagify(input_clients, {
+            whitelist : [],
+            duplicates: false,
+            enforceWhitelist : true,
+            dropdown: {
+                enabled : 0,
+                maxItems: 20
+            },
+            maxTags : 1
+        });
+
+
+        var clients = Array();
+      `{% for clients in clients %}`
+        clients.push({value : `{{ clients.name }}`, id : `{{ clients.id }}`});
+      `{% endfor %}`
+      var clients_length = `{{ clients|length }}`;
+      tagify_clients.settings.whitelist.splice(0, clients_length, ...clients);
+
+
+      // If an client is added
+      tagify_clients.on('add', function(e){
+        document.getElementById("clients_tags").classList.remove("is-invalid");
+      });
+      
+
+    </script>
+
+    
+</body>
+</html>

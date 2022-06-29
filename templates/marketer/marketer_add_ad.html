@@ -1,3 +1,4 @@
+{% load crispy_forms_tags %}
 {% load static %}
 <!DOCTYPE html>
 <html lang="en">
@@ -6,12 +7,39 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Marketer Home</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-0evHe/X+R7YkIZDRvuzKMRqM+OrBnVFBL6DOitfPri4tjfHxaWutUpFmBp4vmVor" crossorigin="anonymous">
     <link rel="stylesheet" href="{% static "assets/css/style.css" %}" />
     <style>
       .datetime-boxes input{
         display: flex;
         margin: 10px 0;
         /* margin: 10px 0; */
+      }
+      #cartTotal{
+        background-color: red;
+        color: white;
+        margin-left: 5px;
+        border-radius: 10px;
+        padding: 5px;
+      }
+      .my-btn{
+        background: #0B5ED7;
+        color: white;
+        border: none;
+        padding: 5px;
+        border-radius: 3px;
+        transition-duration: 300ms;
+      }
+      .my-btn:hover{
+        background: #094db3;
+      }
+      #viewCartLink{
+        display: none;
+        background: #0B5ED7;
+        color: white;
+        position: fixed!important;
+        bottom: 10vh;
+        right: 5vw;
       }
     </style>
 </head>
@@ -31,12 +59,12 @@
         <button class="reset cd-nav-trigger js-cd-nav-trigger" aria-label="Toggle menu"><span></span></button>
       
         <ul class="cd-nav__list js-cd-nav__list">
-          <li class="cd-nav__item"><a href="#0">Tour</a></li>
-          <li class="cd-nav__item"><a href="#0">Support</a></li>
+          {% comment %} <li class="cd-nav__item"><a href="{% url 'marketer_view_cart' 'order_id'  %}" id="viewCartLink">View Cart <span id="cartTotal"> {{ totalAds }} </span> </a></li> {% endcomment %}
+          {% comment %} <li class="cd-nav__item"><a href="#0">Support</a></li> {% endcomment %}
           <li class="cd-nav__item cd-nav__item--has-children cd-nav__item--account js-cd-item--has-children">
             <a href="#0">
-              <img src="https://svgshare.com/i/iPh.svg" alt="avatar">
-              <span>Account</span>
+              <!-- <img src="https://svgshare.com/i/iPh.svg" alt="avatar"> -->
+              <span>Hi {{ name }}</span>
             </a>
         
             <ul class="cd-nav__sub-list">
@@ -66,12 +94,12 @@
               <a href="#0">My Clients</a>
               
               <ul class="cd-side__sub-list">
-                <li class="cd-side__sub-item"><a href="#0">Add Client</a></li>
-                <li class="cd-side__sub-item"><a href="#0">Edit Client</a></li>
+                <li class="cd-side__sub-item"><a href="{% url 'marketer_add_client' %}">Add Client</a></li>
+                <li class="cd-side__sub-item"><a href="#0"> Edit Client</a></li>
               </ul>
             </li>
             
-            <li class="cd-side__item cd-side__item--has-children cd-side__item--comments  js-cd-item--has-children">
+            {% comment %} <li class="cd-side__item cd-side__item--has-children cd-side__item--comments  js-cd-item--has-children">
                 <a href="#0">Comments</a>
                 
                 <ul class="cd-side__sub-list">
@@ -79,44 +107,38 @@
                     <li class="cd-side__sub-item"><a href="#0">Edit Comment</a></li>
                     <li class="cd-side__sub-item"><a href="#0">Delete Comment</a></li>
                 </ul>
-            </li>
+            </li> {% endcomment %}
             <li class="cd-side__item cd-side__item--has-children cd-side__item--users cd-side__item--selected js-cd-item--has-children">
               <a href="#">Manage My Ads</a>
               
               <ul class="cd-side__sub-list">
                 <li class="cd-side__sub-item"><a  aria-current="page" href="#0">Add Ad</a></li>
-                <li class="cd-side__sub-item"><a href="#0">View/Edit Ad</a></li>
+                <li class="cd-side__sub-item"><a href="{% url 'marketer_edit_ads' %}">View/Edit Ad</a></li>
               </ul>
             </li>
           </ul>
-        
-           
-    
-             
-         
-        
           
         </nav>
-        <div class="cd-content-wrapper">
+        <div class="cd-content-wrapper" style="margin-top:-7vh;">
             <h1>Add Advt</h1>
             <form method="POST" id="myForm" enctype="multipart/form-data">
                 <br>
-                Select Client : <select name="customer" id="customer" required>
+                Select Client : <select name="client" id="client" class="form-control" onchange="clientChangedEvent(this)" required>
                     <option disabled="" selected="" value="0"> -- Select Client -- </option>
                     {% for client in clients %}
                     <option value="{{ client.id }}">{{ client.name }}</option>
                     {% endfor %}
                 </select>
-                <br> <br>
+                <br>
                 <div class="main-cont">
-
+                    {% csrf_token %}
                     <div class="ad-details">
-                        {{ form.as_p }}
+                        {{ form|crispy  }}
                         <!-- <button type="button" id="clearImageBtn">Clear Ad Image</button> -->
                         <br>
                         <!-- <button id="remove-ad" type="button" disabled onclick="removeBtnClick(this)">Remove this Ad</button><br><br> -->
                         <p>How many times you want to display ad ? </p>
-                        <select name="selectAdShowTimes" id="selectAdShowTimes" onchange="changeAdDisplayTime(this)">
+                        <select class="form-control" name="selectAdShowTimes" id="selectAdShowTimes" onchange="changeAdDisplayTime(this)">
                           <option disabled="" selected="" value="0"> -- Select No of Ads -- </option>
                           <option value="1" selected>1</option>
                           <option value="2">2</option>
@@ -131,15 +153,33 @@
                         </select>
                         <br>Select Date & Time for Ad(s) Publishing : 
                         <div class="datetime-boxes">
-                          <!-- <input type="datetime-local" id="ad-datetime" name="ad-datetime"> -->
+                          {% comment %} <input type="datetime-local" id="ad-datetime" name="ad-datetime"> {% endcomment %}
                         </div>
                     </div>
                 </div>
                 <br>
             <!-- <button id="add-ad" type="button">Add on more Ad</button> -->
-            
+            <input type="hidden" name="order_id" id="order_id">
             {% csrf_token %}
-            <input type="submit" name="submit" id="submitBtn" value="Submit">
+            {% comment %} <input type="submit" name="submit" id="submitBtn" value="Add to Cart" class="my-btn">  <br><br> {% endcomment %}
+            <button class="btn mt-4" type="submit" id="submitBtn" style="background-color: #157347; color: white;" type="button">
+              Add to Cart
+            </button>
+            <br><br>
+            {% comment %} <a href="{% url 'marketer_view_cart' '_'  %}" id="viewCartLink" style="display: none;">
+              View Cart <span id="cartTotal"></span>
+             </a> {% endcomment %}
+             
+             <a href="{% url 'marketer_view_cart' '_'  %}" id="viewCartLink" class="btn btn-primary position-relative" style="">
+              View Cart
+              <span id="cartTotal" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                0
+                <span class="visually-hidden">Cart Total</span>
+              </span>
+            </a>
+
+            {% comment %} <input type="submit" name="submit" id="gotoCartBtn" value="Goto Cart"> {% endcomment %}
+            
         </form>
         {% if messages %}
         {% for message in messages %}
@@ -147,14 +187,61 @@
         <b> {{ message }} </b>
         {% endfor %}
         {% endif %}
-
+        
     </div> <!-- .content-wrapper -->
 </main> <!-- .cd-main-content -->
 
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js" integrity="sha384-pprn3073KE6tl6bjs2QrFaJGz5/SUsLqktiwsUTF55Jfv3qYSDhgCecCxMW52nD2" crossorigin="anonymous"></script>
 <script src="{% static "assets/js/util.js" %} "></script>
     <script src="{% static "assets/js/menu-aim.js" %} "></script>
     <script src="{% static "assets/js/main.js" %} "></script>
     <script>
+      
+      document.getElementById("client").selectedIndex = 0;
+
+
+      function clientChangedEvent(ele){
+        let client_id = ele.value;
+        let url = `{% url 'get_client_order' %}`;
+        let token = `{{ csrf_token }}`;
+        let postData = new FormData();
+        postData.append("client_id", client_id);
+        postData.append("csrfmiddlewaretoken", token);
+        fetch(url, {
+          method : "POST", 
+          body : postData
+        })
+        .then( res=> {
+          return res.json();
+        })
+        .then( data => {
+          console.log(data);
+          let orderId = data['order_id'];
+          let totalAds = data["totalAds"];
+          localStorage.setItem("order_id", orderId);
+          let view_cart_link = document.querySelector("#viewCartLink");
+          
+          // Remove previous order_id from link
+          let pre_link = view_cart_link.href;
+          let length = pre_link.length;
+          let l1 = length - 36;
+          let new_link = pre_link.substring(0, l1);
+          if(new_link.length > 36){
+            view_cart_link.href = new_link;
+            view_cart_link.href += orderId;
+          }
+          else{
+            // First time
+            view_cart_link.href += orderId;
+          }
+
+
+
+          view_cart_link.style.display = "inline-flex";
+          document.getElementById("cartTotal").innerText = totalAds;
+        })
+      }
+      
 
       document.getElementById("selectAdShowTimes").selectedIndex = 0;
 
@@ -170,23 +257,13 @@
           append_ele.type = "datetime-local";
           append_ele.id = "ad-datetime";
           append_ele.name = "ad-datetime";
+          append_ele.classList.add("form-control")
+          append_ele.required = true;
+          
           let cln = append_ele.cloneNode(true);
           date_time_boxes.appendChild(cln);
 
         }
-
-
-
-        
-        //     let para = document.querySelector(".ad-details");
-        //     var cln = para.cloneNode(true);
-        //     document.querySelector(".main-cont").appendChild(cln);
-
-        
-        //     let para = document.querySelector(".ad-details");
-        //     var cln = para.cloneNode(true);
-        //     document.querySelector(".main-cont").appendChild(cln);
-
       }
 
         // document.getElementById("remove-ad").disabled = true
@@ -206,9 +283,31 @@
         myForm.addEventListener("submit", (e)=>{
             let form = document.getElementById("");
             e.preventDefault();
-            let all_ads = document.querySelectorAll(".ad-details");
-            let msg = "Total Ads " + all_ads.length;
+            if(document.getElementById("client").selectedIndex == 0){
+              alert("Please select and client!");
+              return;
+            }
+            if(document.getElementById("selectAdShowTimes").selectedIndex == 0){
+              alert("Please select atleast 1 ad unit(s)")
+              return;
+            }
+            
+            if(document.getElementById("id_type").selectedIndex == 0){
+              alert("Please select Ad Type")
+              return;
+            }
+
+
+            
+
+
+            let submitBtn = document.getElementById("submitBtn");
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Adding to cart... ';
+            {% comment %} let all_ads = document.querySelectorAll(".ad-details");
+            let msg = "Total Ads " + all_ads.length; {% endcomment %}
             let url = `{% url 'marketer_save_ad' %}`;
+            myForm.querySelector("#order_id").value = localStorage.getItem("order_id");
             fetch(url,{
               "method": "POST",
               "body": new FormData(myForm)
@@ -217,6 +316,22 @@
             })
             .then(data => {
               console.log(data);
+              submitBtn.disabled = false;
+              submitBtn.innerHTML = 'Add to Cart';
+
+              let result = data["result"];
+              let msg = data["msg"];
+              if(result){
+                let totalAds = data["totalAds"];
+                document.getElementById("cartTotal").innerText = totalAds;
+                document.getElementById("id_desc").value = "";
+                document.getElementById("id_ad_image").value = "";
+                document.getElementById("id_type").selectedIndex = 0;
+                document.getElementById("selectAdShowTimes").selectedIndex = 0;
+                
+                document.querySelector(".datetime-boxes").innerHTML = "";
+              }
+              alert(msg);
             })
         })
         

@@ -1,0 +1,120 @@
+{% load crispy_forms_tags %}
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Marketer Home</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-0evHe/X+R7YkIZDRvuzKMRqM+OrBnVFBL6DOitfPri4tjfHxaWutUpFmBp4vmVor" crossorigin="anonymous">
+    <!-- <link rel="stylesheet" href="{% static "assets/css/style.css" %}" /> -->
+    <!-- CSS only -->
+
+    <style>
+      .datetime-boxes input{
+        display: flex;
+        margin: 10px 0;
+        /* margin: 10px 0; */
+      }
+      #cartTotal{
+        background-color: red;
+        color: white;
+        margin-left: 5px;
+        border-radius: 10px;
+        padding: 5px;
+      }
+      @media only screen and (min-width: 600px) {
+        #logoutBtn{
+          position: absolute;
+          right: 10px;
+          top:10;
+        }
+        #myDropdown{
+          position: absolute;
+          right: 10vw;
+          top:10px;
+          
+        }
+      }
+      #ad-seprator{
+        border: 1px solid rgb(175, 175, 175);
+        margin: 0 20px;
+      }
+      #ad-seprator:last-child{
+        display: none;
+      }
+    </style>
+</head>
+<body>
+
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="#">OTT Media</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        
+        
+
+        {% comment %} <form class="d-flex" role="search">
+          <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
+          <button class="btn btn-outline-success" type="submit">Search</button>
+        </form>  {% endcomment %}
+
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+          {% comment %} <li class="nav-item">
+            <a class="nav-link active" aria-current="page" href="#">Home</a>
+          </li> {% endcomment %}
+          
+          <li class="nav-item dropdown" id="myDropdown">
+            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+              Hi {{ advt.order_id.marketer_id.first_name }}
+            </a>
+            <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+              <li><a class="dropdown-item" href="#">Manage Account</a></li>
+              {% comment %} <li><hr class="dropdown-divider"></li> {% endcomment %}
+              <li><a class="dropdown-item" href="#">Logout</a></li>
+            </ul>
+          </li>
+          
+        </ul> 
+        {% comment %} <a href="logout.php" class="btn btn-outline-success" id="logoutBtn">Logout</a> {% endcomment %}
+        
+        
+
+      </div>
+    </div>
+  </nav>
+
+  <div class="container my-3">
+    <div class="row gx-5">
+        <div class="col">
+          <div class="p-3 border bg-light">
+              <h3>Edit Ad Form</h3>
+          </div>
+        </div>
+    </div>
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form|crispy}}
+        <input type="submit" class="btn btn-outline-success mt-5" value="Save Changes" />
+    </form>
+ 
+      <br><br><br><br><br><br><br><br><br>
+  </div>
+  
+  
+    {% comment %} <script src="{% static "assets/js/util.js" %} "></script>
+    <script src="{% static "assets/js/menu-aim.js" %} "></script>
+    <script src="{% static "assets/js/main.js" %} "></script> {% endcomment %}
+
+    <!-- JavaScript Bundle with Popper -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js" integrity="sha384-pprn3073KE6tl6bjs2QrFaJGz5/SUsLqktiwsUTF55Jfv3qYSDhgCecCxMW52nD2" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+<script>
+ 
+</script>
+</body>
+</html>

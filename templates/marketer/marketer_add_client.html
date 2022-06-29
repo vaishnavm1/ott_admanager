@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Marketer Home</title>
+    <title>Marketer Add Client</title>
     <link rel="stylesheet" href="{% static "assets/css/style.css" %}" />
 </head>
 <body>
@@ -64,7 +64,7 @@
               </ul>
             </li>
             
-            <li class="cd-side__item cd-side__item--has-children cd-side__item--comments  js-cd-item--has-children">
+            {% comment %} <li class="cd-side__item cd-side__item--has-children cd-side__item--comments  js-cd-item--has-children">
                 <a href="#0">Comments</a>
                 
                 <ul class="cd-side__sub-list">
@@ -72,13 +72,13 @@
                     <li class="cd-side__sub-item"><a href="#0">Edit Comment</a></li>
                     <li class="cd-side__sub-item"><a href="#0">Delete Comment</a></li>
                 </ul>
-            </li>
+            </li> {% endcomment %}
             <li class="cd-side__item cd-side__item--has-children cd-side__item--users js-cd-item--has-children">
               <a href="#">Manage My Ads</a>
               
               <ul class="cd-side__sub-list">
                 <li class="cd-side__sub-item"><a href="{% url 'marketer_add_ad' %}">Add Ad</a></li>
-                <li class="cd-side__sub-item"><a href="#0">View/Edit Ad</a></li>
+                <li class="cd-side__sub-item"><a href="{% url 'marketer_edit_ads' %}">View/Edit Ad</a></li>
               </ul>
             </li>
           </ul>
