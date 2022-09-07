@@ -1,0 +1,72 @@
+{% if order.client_id.agency_id != None %}
+<div class="mt-3">
+  
+</div>
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="info-fill" fill="currentColor" viewBox="0 0 16 16">
+    <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm.93-9.412-1 4.705c-.07.34.029.533.304.533.194 0 .487-.07.686-.246l-.088.416c-.287.346-.92.598-1.465.598-.703 0-1.002-.422-.808-1.319l.738-3.468c.064-.293.006-.399-.287-.47l-.451-.081.082-.381 2.29-.287zM8 5.5a1 1 0 1 1 0-2 1 1 0 0 1 0 2z"/>
+  </symbol>
+</svg>
+
+<div class="alert alert-primary d-flex align-items-center mt-3" role="alert">
+  <svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="Info:"><use xlink:href="#info-fill"/></svg>
+  <div>
+    Agency Discount  <b> ֍ Instant Payment</b> : 25% <b> ֍ PDC Cheque</b> 20%
+  </div>
+</div>
+
+<div class="row">
+    <div class="form-group col-md-6">
+      <label for="modeOfPayment">Select Mode Of Payment</label>
+      <select class="form-select" aria-label="Default select example" onchange="changeMopEventAgency(this)" id="modeOfPayment">
+        <option disabled="" selected="" value="0"> -- Select -- </option>
+          <option value="Cash">Cash</option>
+          <option value="Upi">UPI</option>
+          <option value="Cheque">Cheque</option>
+          <option value="Pdc_Cheque">PDC Cheque</option>
+          <option value="Net-Banking">Net Banking</option>
+        </select>
+        <div id="modeOfPayment" class="invalid-feedback">
+          Please Select a Mode of Payment
+        </div>
+      </div>
+      <div class="form-group col-md-6" id="trans_id_box" style="display: none;">
+        <label for="transaction_id">Transaction ID</label>
+        <input type="text" class="form-control" id="transaction_id" placeholder="Enter Transaction ID" required="">
+        <div id="transaction_id" class="invalid-feedback">
+          Please enter the Transaction ID
+        </div>
+      </div>
+</div>
+
+<h4 id="agencyDiscountAmt" class="mt-4" style="display: none;"></h4>
+<button class="btn btn-lg btn-success mt-4" id="submitAdBtn">Submit Payment </button> <br><br>
+{% else %}
+  <div class="row">
+    <div class="form-group col-md-6">
+        <label for="modeOfPayment">Select Mode Of Payment</label>
+        <select class="form-select" aria-label="Default select example" onchange="changeMopEvent(this)" id="modeOfPayment">
+          <option disabled="" selected="" value="0"> -- Select -- </option>
+          <option value="Cash">Cash</option>
+            <option value="Upi">UPI</option>
+            <option value="Cheque">Cheque</option>
+            {% if order.client_id.agency_id != None %}
+              <option value="Pdc_Cheque">PDC Cheque</option>
+            {% endif %}
+            <option value="Net-Banking">Net Banking</option>
+          </select>
+          <div id="modeOfPayment" class="invalid-feedback">
+            Please Select a Mode of Payment
+          </div>
+        </div>
+        <div class="form-group col-md-6" id="trans_id_box" style="display: none;">
+          <label for="transaction_id">Transaction ID</label>
+          <input type="text" class="form-control" id="transaction_id" placeholder="Enter Transaction ID" required="">
+          <div id="transaction_id" class="invalid-feedback">
+            Please enter the Transaction ID
+          </div>
+        </div>
+  </div>
+  <button class="btn btn-lg btn-success mt-4" id="submitAdBtn">Submit Payment </button> <br><br>
+{% endif %}

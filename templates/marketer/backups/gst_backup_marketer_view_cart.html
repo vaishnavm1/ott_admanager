@@ -1,0 +1,833 @@
+{% load static %}
+{% comment %} This is backup before applying GST logic {% endcomment %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Marketer Home</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-0evHe/X+R7YkIZDRvuzKMRqM+OrBnVFBL6DOitfPri4tjfHxaWutUpFmBp4vmVor" crossorigin="anonymous">
+    
+    
+    <!-- <link rel="stylesheet" href="{% static "assets/css/style.css" %}" /> -->
+    <!-- CSS only -->
+
+    <style>
+      .datetime-boxes input{
+        display: flex;
+        margin: 10px 0;
+        /* margin: 10px 0; */
+      }
+      #cartTotal{
+        background-color: red;
+        color: white;
+        margin-left: 5px;
+        border-radius: 10px;
+        padding: 5px;
+      }
+      @media only screen and (min-width: 600px) {
+        #logoutBtn{
+          position: absolute;
+          right: 10px;
+          top:10;
+        }
+        #myDropdown{
+          position: absolute;
+          right: 10vw;
+          top:10px;
+          
+        }
+      }
+      #ad-seprator{
+        border: 1px solid rgb(175, 175, 175);
+        margin: 0 20px;
+      }
+      #ad-seprator:last-child{
+        display: none;
+      }
+
+
+      
+      #myImg {
+        border-radius: 5px;
+        cursor: pointer;
+        transition: 0.3s;
+      }
+      
+      #myImg:hover {opacity: 0.7;}
+      
+      /* The Modal (background) */
+      .modalz {
+        display: none; /* Hidden by default */
+        position: fixed; /* Stay in place */
+        z-index: 1; /* Sit on top */
+        padding-top: 100px; /* Location of the box */
+        left: 0;
+        top: 0;
+        width: 100%; /* Full width */
+        height: 100%; /* Full height */
+        overflow: auto; /* Enable scroll if needed */
+        background-color: rgb(0,0,0); /* Fallback color */
+        background-color: rgba(0,0,0,0.9); /* Black w/ opacity */
+      }
+      
+      /* Modal Content (image) */
+      .modalz-content {
+        margin: auto;
+        display: block;
+        width: 80%;
+        max-width: 700px;
+      }
+      
+      /* Caption of Modal Image */
+      #captionz {
+        margin: auto;
+        display: block;
+        width: 80%;
+        max-width: 700px;
+        text-align: center;
+        color: #ccc;
+        padding: 10px 0;
+        height: 150px;
+      }
+      
+      /* Add Animation */
+      .modalz-content, #caption {  
+        -webkit-animation-name: zoom;
+        -webkit-animation-duration: 0.6s;
+        animation-name: zoom;
+        animation-duration: 0.6s;
+      }
+      
+      @-webkit-keyframes zoom {
+        from {-webkit-transform:scale(0)} 
+        to {-webkit-transform:scale(1)}
+      }
+      
+      @keyframes zoom {
+        from {transform:scale(0)} 
+        to {transform:scale(1)}
+      }
+      
+      /* The Close Button */
+      .close {
+        position: absolute;
+        top: 15px;
+        right: 35px;
+        color: #f1f1f1;
+        font-size: 40px;
+        font-weight: bold;
+        transition: 0.3s;
+      }
+      
+      .close:hover,
+      .close:focus {
+        color: #bbb;
+        text-decoration: none;
+        cursor: pointer;
+      }
+      
+      /* 100% Image Width on Smaller Screens */
+      @media only screen and (max-width: 700px){
+        .modalz-content {
+          width: 100%;
+        }
+      }
+
+    </style>
+</head>
+<body>
+
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="#">OTT Media</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        
+        
+
+        {% comment %} <form class="d-flex" role="search">
+          <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
+          <button class="btn btn-outline-success" type="submit">Search</button>
+        </form>  {% endcomment %}
+
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+          {% comment %} <li class="nav-item">
+            <a class="nav-link active" aria-current="page" href="#">Home</a>
+          </li> {% endcomment %}
+          
+          <li class="nav-item dropdown" id="myDropdown">
+            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+              Hi {{ order.marketer_id.first_name }}
+            </a>
+            <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+              <li><a class="dropdown-item" href="#">Manage Account</a></li>
+              {% comment %} <li><hr class="dropdown-divider"></li> {% endcomment %}
+              <li><a class="dropdown-item" href="#">Logout</a></li>
+            </ul>
+          </li>
+          
+        </ul> 
+        {% comment %} <a href="logout.php" class="btn btn-outline-success" id="logoutBtn">Logout</a> {% endcomment %}
+        
+        
+
+      </div>
+    </div>
+  </nav>
+
+  <div class="container my-3">
+    <div class="row gx-5">
+        <div class="col">
+          <div class="p-3 border bg-light">
+            <h3>Welcome <b> {{ order.marketer_id.first_name }}</b> You have total <b> <span id="totalAds">{{ totalAds}}<span> Ad(s) </b> in your cart of Client <b>{{ client_name }}</b></h3>
+          </div>
+        </div>
+      </div>
+  
+  
+  {% if totalAds > 0 %}
+
+
+    <div class="accordion mt-3" id="accordionPanelsStayOpenExample">
+      <div class="accordion-item">
+        <h2 class="accordion-header" id="headingOne">
+          <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+           <b>Click here to view Ads in the order </b>
+          </button>
+        </h2>
+      {% for ad in order.advt_set.all %}
+        <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#accordionExample">
+          <div class="accordion-body">
+            <div class="ad-container" data-id="{{ ad.id }}">
+              <h6>Ad Location(s) : <b>
+                Total : {{ ad.ad_locs.all|length }} [{% for x in ad.ad_locs.all %}
+                <i>{{ x.location.name  }}</i> type : {{ x.location.type }} ₹ : {{ x.location.rate }},
+                {% endfor %}]
+              </b> <br><h6>
+              <h6>Ad Amount : <b>₹ {{ ad.ad_amt }}</b> <br></h6>
+              <h6>Publishing On : <b>{{ ad.ad_pub_date }}</b></h6>
+              {% if orderviewform %}
+                {% if order.discount_requested == True %}
+                {% comment %} <button class="btn btn-outline-danger" disabled>Remove Ad</button> {% endcomment %}
+                {% else %}
+                {% comment %} Do now show remove ad button if discount is asked {% endcomment %}
+                {% endif %}
+              {% else %}
+                {% if order.discount_requested == True %}
+
+                {% else %}
+                  <button class="btn btn-outline-danger" onclick="removeAdBtnEvent(this)">Remove Ad</button>
+                {% endif %}
+                
+              {% endif %}
+            </div>
+            {% comment %} <strong>This is the first item's accordion body.</strong> It is shown by default, until the collapse plugin adds the appropriate classes that we use to style each element. These classes control the overall appearance, as well as the showing and hiding via CSS transitions. You can modify any of this with custom CSS or overriding our default variables. It's also worth noting that just about any HTML can go within the <code>.accordion-body</code>, though the transition does limit overflow. {% endcomment %}
+          </div>
+        </div>
+        <hr id="ad-seprator">
+      {% endfor %}
+    </div> {% comment %} END Accordian {% endcomment %}
+    
+    <div class="row gx-5 mt-3">
+      <div class="col">
+        <div class="p-3 border bg-light">
+          <h3>
+            {% load convert_filter %}
+            {% if order.discount_decision == True %}
+                <h4>Discount request has been accepted</h4>
+                <h4>Orignal Bill Amount : {{ order.total_bill_amt|convert_to_inr }} </h4>
+                <h4>Dicount given amount: {{ order.discount_alloted_amt|convert_to_inr }}</h4>
+                <h4>New Amount :{{ order.final_bill_amt|convert_to_inr }}</h4>
+                <h4>New Payable Amount with 18% GST : <b>{{ order.gst_final_bill_amt|convert_to_inr }}</b></h4>
+              {% else %}
+                Total Bill value : 
+                <span id="totalBillAmt">{{ order.total_bill_amt|convert_to_inr }} </span> 
+                <h3>18% GST : <span><b>{{ order.gst_final_bill_amt|convert_to_inr }}</b></span></h3>
+              {% endif %}
+          </h3>
+        </div>
+      </div>
+    </div>
+
+
+    {% comment %} <a href="{% url 'generate_ro' '_' %}" class="btn btn-warning mt-4 mb-4" id="generateRoLink">Generate RO</a> {% endcomment %}
+    
+    
+    {% comment %} New Start {% endcomment %}
+
+  {% if order.order_status ==  order.Status.FRESH %}
+    {% comment %} Show discount question? and also RO {% endcomment %}
+      {% if order.discount_requested == True %} 
+
+        {% if order.discount_decision == None %}
+          <h3>
+            You have request a discount of Rs :<b> {{ order.discount_req_amt }} </b><br>
+            Please wait for 24-36 hours...
+          </h3>
+          <h5>Discount decision status : Pending</h5>
+
+        {% elif order.discount_decision == False %}
+             {% comment %} Discount is NOT given {% endcomment %}
+            <h5>Discount request has not been accepted, client has to pay full amount</h5>
+            <a href="{% url 'generate_ro' '_' %}" class="btn btn-warning mt-4 mb-4" id="generateRoLink">Generate RO</a>
+            <h5>Upload Client Signed & Stamped Photo of Relase Order (RO) </h5>
+              {% if order.signed_release_order == "" %}
+                {% include "marketer/snips/ro_upload_form_container.html" with showForm=True  %}
+              {% else %}
+                {% include "marketer/snips/ro_upload_form_container.html" with showForm=False  %}
+            
+              {% endif %}
+            {% include "marketer/snips/show_mop_container.html" %}
+
+
+        {% elif order.discount_decision == True %}
+              <a href="{% url 'generate_ro' '_' %}" class="btn btn-warning mt-4 mb-4" id="generateRoLink">Generate RO</a>
+              <h5>Upload Client Signed & Stamped Photo of Relase Order (RO) </h5>
+              {% if order.signed_release_order %}
+              <a href="#" id="myImg" data-src='{{ order.signed_release_order.url }}' showForm=False>View uploaded RO</a>
+                
+                {% include "marketer/snips/ro_upload_form_container.html" with showForm=False  %}
+              {% else %}
+                {% comment %} Not uploaded RO {% endcomment %}
+                {% include "marketer/snips/ro_upload_form_container.html" with showForm=True  %}
+              {% endif %}
+              
+              {% include "marketer/snips/show_mop_container.html" %}
+
+      {% endif %}
+        
+      {% elif order.discount_requested == False %}
+        {% comment %} Discount is not yet requested {% endcomment %}
+          <a href="{% url 'generate_ro' '_' %}" class="btn btn-warning mt-4 mb-4" id="generateRoLink">Generate RO</a>
+          <h5>Upload Client Signed & Stamped Photo of Relase Order (RO) </h5>
+          {% if order.signed_release_order == "" %}
+              {% include "marketer/snips/ro_upload_form_container.html" with showForm=True  %}
+            {% else %}
+            {% include "marketer/snips/ro_upload_form_container.html" with showForm=False  %}
+          
+          {% endif %}
+
+          <p style="display: inline-block;">Do you want to give this client discount?</p>
+            <button class="btn btn-primary" id="confirmYesDiscountBtn">Yes</button>
+            <div class="row discount-allow-container" style="display: none;">
+              <div class="form-group col-md-6">
+                <label for="discounted_amt">Enter discount you want to give</label>
+                <input type="number" class="form-control" name="discounted_amt" id="discounted_amt" value="0" onkeyup="keyDownDiscountAmt(event)" />
+                <div id="discounted_amt" class="invalid-feedback">
+                  Discount Amount should be less than Orignal Amount
+                </div>
+              </div>
+              <div class="form-group col-md-5">
+                <label for="finalAmt">Final Amount will be</label>
+                <h4 id="finalAmt">{{ order.total_bill_amt }}</h4>
+              </div>
+              <div class="form-group col-md-1">
+                <button class="btn btn-danger btn-sm" id="cancelDiscountBtn">Cancel Discount</button>
+              </div>
+              <div class="row">
+                <div class="form-group col-md-4 mt-4">
+                  <button class="btn btn-primary btn-sm" onclick="submitDiscountRequest()">Submit a Discount Request</button>
+                </div>
+                <div class="form-group col-md-4 mt-4">
+                  (Discount request may be Accepted or Rejected in a timeline of 24-36 hours)
+                </div>
+              </div>
+            </div>
+
+            <div class="payment-container">
+
+              <div class="row">
+                <div class="form-group col-md-6">
+                  <label for="modeOfPayment">Select Mode Of Payment</label>
+                  <select class="form-select" aria-label="Default select example" onchange="changeMopEvent(this)" id="modeOfPayment">
+                    <option disabled="" selected="" value="0"> -- Select -- </option>
+                      <option value="Cash">Cash</option>
+                      <option value="Upi">UPI</option>
+                      <option value="Cheque">Cheque</option>
+                      <option value="Net-Banking">Net Banking</option>
+                    </select>
+                    <div id="modeOfPayment" class="invalid-feedback">
+                      Please Select a Mode of Payment
+                    </div>
+                  </div>
+                  <div class="form-group col-md-6" id="trans_id_box" style="display: none;">
+                    <label for="transaction_id">Transaction ID</label>
+                    <input type="text" class="form-control" id="transaction_id" placeholder="Enter Transaction ID" required="">
+                    <div id="transaction_id" class="invalid-feedback">
+                      Please enter the Transaction ID
+                    </div>
+                  </div>
+                </div>
+                <button class="btn btn-md btn-success mt-4" id="submitAdBtn">Submit Payment </button> <br><br>
+            </div>
+      {% endif %}
+      {% if order.discount_requested == True %}
+      {% endif %}
+      
+
+  {% elif order.order_status == order.Status.IN_REVIEW %}
+      {% comment %} Orer status is IN_REVIEW {% endcomment %}
+                <a href="{% url 'generate_ro' '_' %}" class="btn btn-warning mt-4 mb-4" id="generateRoLink">Generate RO</a>
+                <h5>Upload Client Signed & Stamped Photo of Relase Order (RO) </h5>
+                {% if order.signed_release_order == "" %}
+                    {% include "marketer/snips/ro_upload_form_container.html" with showForm=True  %}
+                  {% else %}
+                  {% include "marketer/snips/ro_upload_form_container.html" with showForm=False  %}
+                {% endif %}
+              {% comment %} If discount is given {% endcomment %}
+              {% if order.discount_decision == True %}
+                <div class="row gx-5">
+                  <div class="col">
+                    <div class="p-1 border bg-light mt-3">
+                      <h5>
+                        Discount given : <b> ₹ {{ order.discount_alloted_amt|convert_to_inr }}</b>
+                      </h5>
+                    </div>
+                    <div class="p-1 border bg-light mt-3">
+                      <h5>
+                        Discounted New Bill Amount : <b>₹ {{ order.discounted_new_bill_amt|convert_to_inr }}</b>
+                      </h5>
+                    </div>
+                  </div>
+                  
+                </div>
+            
+              {% else %}
+              {% comment %} If discount is NOT given {% endcomment %}
+                {% comment %} Not Given discount {% endcomment %}
+              {% endif  %}
+              <h5 class="mt-4">Order's Payment is in <span class="badge bg-secondary">Review</span>, Please wait for 24-48 hours to confirm payment</h5>
+              <div class="row">
+                <div class="form-group col-md-6">
+                  <label for="modeOfPayment">{{ orderviewform.mode_of_pay.label }}</label>
+                  {{ orderviewform.mode_of_pay }}
+                </div>
+                <div class="form-group col-md-6">
+                  <label for="transaction_id">{{ orderviewform.trans_id.label }}</label>
+                  {{ orderviewform.trans_id }}
+                </div>
+              </div>
+
+      {% elif order.order_status == order.Status.ACCEPTED %}
+
+                <a href="{% url 'generate_ro' '_' %}" class="btn btn-warning mt-4 mb-4" id="generateRoLink">Generate RO</a>
+                <h5>Upload Client Signed & Stamped Photo of Relase Order (RO) </h5>
+                {% if order.signed_release_order == "" %}
+                  <b>Please note that Ad will NOT be published unless Client Signed RO is uploaded</b>
+                    {% include "marketer/snips/ro_upload_form_container.html" with showForm=True  %}
+                {% else %}
+                <a href="#" id="myImg" data-src='{{ order.signed_release_order.url }}'>View uploaded RO</a>
+                  {% include "marketer/snips/ro_upload_form_container.html" with showForm=False  %}
+                {% endif %}
+
+                    {% comment %} Show MOP Info {% endcomment %}
+                    <div class="row">
+                      <div class="form-group col-md-6">
+                        <label for="modeOfPayment">{{ orderviewform.mode_of_pay.label }}</label>
+                        {{ orderviewform.mode_of_pay }}
+                      </div>
+                      <div class="form-group col-md-6">
+                        <label for="transaction_id">{{ orderviewform.trans_id.label }}</label>
+                        {{ orderviewform.trans_id }}
+                      </div>
+                    </div>
+
+                {% comment %} check only if discount was request or not {% endcomment %}
+                {% if order.discount_requested == True %}
+                    
+                    {% comment %} If discount was alloted or not to the accepted order{% endcomment %}                    
+                    {% if order.discount_decision == True %}
+                      {% comment %} Discount was given {% endcomment %}
+                      <div class="p-1 border bg-light mt-3">
+                        <h5>
+                          Discount given : <b> ₹ {{ order.discount_alloted_amt}}</b>
+                        </h5>
+                      </div>
+                      <div class="p-1 border bg-light mt-3">
+                        <h5>
+                          Discounted New Bill Amount : <b>₹ {{ order.discounted_new_bill_amt }}</b>
+                        </h5>
+                      </div>
+
+                {% elif  order.discount_decision == False %}
+                      {% comment %} Discount was not given {% endcomment %}
+                        <h4>Discount appeal was rejected</h4>
+                    {% endif %}
+                {% endif %}
+
+                <h4 class="mt-4">Order's payment has been <span class="badge bg-success">Confirmed</span> as recieved</h4>
+                <h4 class="mt-4">Goto View/Edit Ad if you want to edit anything in order</h4>
+
+
+      {% elif order.order_status == order.Status.REJECTED %}
+              <h4 class="mt-4">Order's payment has been <span class="badge bg-danger">Rejected</span> </h4>
+              <h5>Please contact accountant as soon as possible</h5>
+              
+
+      {% endif %}
+
+      {% comment %} New Start END {% endcomment %}
+
+
+  {% else %} 
+    {% comment %} Incase where Ads are 0 {% endcomment %}
+    
+    <svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+      <symbol id="info-fill" fill="currentColor" viewBox="0 0 16 16">
+        <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm.93-9.412-1 4.705c-.07.34.029.533.304.533.194 0 .487-.07.686-.246l-.088.416c-.287.346-.92.598-1.465.598-.703 0-1.002-.422-.808-1.319l.738-3.468c.064-.293.006-.399-.287-.47l-.451-.081.082-.381 2.29-.287zM8 5.5a1 1 0 1 1 0-2 1 1 0 0 1 0 2z"/>
+      </symbol>
+    </svg>
+    
+    <div class="alert alert-primary d-flex align-items-center mt-3" role="alert">
+      <svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="Info:"><use xlink:href="#info-fill"/></svg>
+      <div>
+        Add Ads to the cart to view ads here... 
+      </div>
+    </div>
+    
+    
+    {% endif %}
+
+    
+    
+      <!-- <a class="btn btn-lg btn-warning" href="{% url 'generate_ro'  order.order_id  %} ">Generate RO</a> -->
+
+      <br><br><br><br><br><br><br><br><br>
+  </div>
+
+
+  <div id="myModal" class="modalz">
+    <span class="close">&times;</span>
+    <img class="modalz-content" id="img01">
+    <div id="captionz"></div>
+  </div>
+  
+  
+    {% comment %} <script src="{% static "assets/js/util.js" %} "></script>
+    <script src="{% static "assets/js/menu-aim.js" %} "></script>
+    <script src="{% static "assets/js/main.js" %} "></script> {% endcomment %}
+
+    <!-- JavaScript Bundle with Popper -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js" integrity="sha384-pprn3073KE6tl6bjs2QrFaJGz5/SUsLqktiwsUTF55Jfv3qYSDhgCecCxMW52nD2" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+<script>
+  
+  if(document.getElementById("reupload-ro-btn")){
+    let btn = document.getElementById("reupload-ro-btn");
+    btn.onclick = function(e){
+      document.querySelector(".reupload-ro-container").style.display = "block";
+      btn.style.display = "none";
+    }
+  }
+  if(document.getElementById("myForm")){
+    let myForm = document.getElementById("myForm");
+    myForm.addEventListener("submit", (e)=>{
+      e.preventDefault();
+      let url = `{% url 'marketer_upload_ro_image' order.order_id %}`;
+      let token = `{{ csrf_token }}`;
+      let postData = new FormData();
+      postData.append("csrfmiddlewaretoken", token);
+    
+      fetch(url, {
+        method : "POST",
+        body: new FormData(myForm)
+      })
+      .then( res => {
+        return res.json();
+      })
+      .then( data => {
+        let msg = data['msg'];
+        let result = data['result'];
+        if(result){
+          swal(msg, {
+            icon: "success",
+          })
+          .then( value => {
+                window.location.reload();
+          })
+        }
+        else{
+          swal(msg, {
+            icon: "error",
+            })
+          }
+      });
+  
+    });
+    
+  }
+
+
+  if(document.getElementById('discounted_amt')){
+    document.getElementById('discounted_amt').value = 0;
+  }
+  let order_id = localStorage.getItem("order_id");
+  if(document.getElementById("generateRoLink")){
+    let generate_ro_link = document.getElementById("generateRoLink");
+    let the_link = generate_ro_link.href;
+  
+    let link_len = the_link.length;
+    link_len = link_len - 1; // Removing _ from last
+    let new_link = the_link.substring(0, link_len)
+    generate_ro_link.href = new_link;
+    generate_ro_link.href += order_id;
+  }
+
+
+
+  
+  if(document.getElementById("modeOfPayment").value != "Cash"){
+    if(document.getElementById("trans_id_box")){
+      document.getElementById("trans_id_box").style.display = "block";
+    }
+  }
+  else{
+    if(document.getElementById("trans_id_box")){
+      document.getElementById("trans_id_box").style.display = "none";
+    }
+  }
+
+
+  function changeMopEvent(ele){
+    let value = ele.value;
+    if(value != "Cash"){
+      document.getElementById("trans_id_box").style.display = "block";
+    }
+    else{
+      document.getElementById("trans_id_box").style.display = "none";
+      document.getElementById("transaction_id").value = "";
+    }
+  }
+
+  function removeAdBtnEvent(btn){
+    let advt_id = btn.parentElement.dataset.id;
+    let order_id = localStorage.getItem("order_id");
+    let url = "{% url 'delete_advt' %}";
+    let token = `{{ csrf_token }}`
+    let postData = new FormData();
+    postData.append("advt_id", advt_id);
+    postData.append("order_id", order_id);
+    postData.append("csrfmiddlewaretoken", token);
+    fetch(url, {
+      body: postData,
+      method : "POST"
+    })
+    .then(res => {
+      return res.json();
+    })
+    .then( data => {
+      console.log("Ad Deleted");
+      let lastAd = data["last_ad"];
+      if(lastAd){
+        btn.parentElement.parentElement.remove();
+        alert("Your cart is empty now...")
+        let add_ad_url = `{% url 'marketer_add_ad' %}`;
+        window.location.href = add_ad_url;
+        
+      }
+      else{
+        btn.parentElement.parentElement.remove();
+        let old_total_ads = `{{ totalAds}}`;
+        old_total_ads -= 1;
+        let new_bill_amt = data["new_total_bill_amt"];
+
+        document.getElementById("totalAds").innerText = old_total_ads;
+        document.getElementById("totalBillAmt").innerText = new_bill_amt;
+        
+
+      }
+    })
+  }
+
+  // Give discount or not frontend logic
+  if(document.getElementById('confirmYesDiscountBtn')){
+    let confirmYesDiscountBtn = document.getElementById('confirmYesDiscountBtn');
+    confirmYesDiscountBtn.addEventListener("click", (e)=>{
+      document.querySelector(".discount-allow-container").style.display = "flex";
+      confirmYesDiscountBtn.style.display = "none";
+      document.querySelector(".payment-container").style.display = "none";
+    })
+  }
+  
+  if(document.getElementById('cancelDiscountBtn')){
+    let cancelDiscountBtn = document.getElementById('cancelDiscountBtn');
+    cancelDiscountBtn.addEventListener("click", (e)=>{
+      document.querySelector(".discount-allow-container").style.display = "none";
+      confirmYesDiscountBtn.style.display = "block";
+      document.querySelector(".payment-container").style.display = "block";
+    })
+  }
+  
+  let total_bill_amt =  `{{ order.total_bill_amt }}`;
+  function submitDiscountRequest(){
+    let discounted_amt = document.getElementById("discounted_amt").value;
+    let newPrice = parseInt(total_bill_amt) - discounted_amt;
+    let msg = "Do you really want to give " + discounted_amt + " ₹ Discount? New price will be " + newPrice + " ₹";
+    swal({
+              title: "Confirm",
+              text: msg,
+              icon: "warning",
+              buttons: true,
+              dangerMode: true,
+            })
+            .then( willDelete => {
+              if(willDelete){
+                let token = `{{ csrf_token }}`
+                let order_id = `{{ order.order_id }}`;
+
+                let postData = new FormData();
+                postData.append("order_id", order_id);                
+                postData.append("csrfmiddlewaretoken", token);
+                postData.append("discount_requested", discounted_amt);
+                postData.append("total_bill_amt", total_bill_amt);
+                let url = `{% url 'marketer_request_discount' %}`;
+                fetch(url, {
+                  body: postData,
+                  method : "POST"
+                })
+                .then(res=>{
+                  return res.json()
+                })
+                .then(data => {
+                  let result = data['result'];
+                  let msg = data['msg'];
+                  if(result){
+                    swal(msg, {
+                      icon: "success",
+                    })
+                    .then( value => {
+                      window.location.reload();
+                    })
+                  }
+                  else{
+                    swal({
+                      title: "Failure",
+                      text: msg,
+                      icon: "error",
+                      button: "OK"
+                    });
+                  }
+                    
+                })
+              
+            }
+          })
+
+  }
+
+  function keyDownDiscountAmt(ele){
+    var ASCIICode = (ele.which) ? ele.which : ele.keyCode;
+    if (ASCIICode > 31 && (ASCIICode < 48 || ASCIICode > 57)){
+    }
+    else{
+        let amt = ele.target.value;
+        if(amt > parseInt(total_bill_amt)){
+          document.getElementById("discounted_amt").classList.add("is-invalid");
+        }
+        else{
+          document.getElementById("discounted_amt").classList.remove("is-invalid");
+        }
+        let newValue = parseInt(total_bill_amt) - amt;
+        document.getElementById("finalAmt").innerText = newValue;
+        
+    }
+  }
+
+  if(document.getElementById("submitAdBtn")){
+    let submitAdBtn = document.getElementById("submitAdBtn");
+    submitAdBtn.addEventListener("click", (e)=>{
+      if(document.getElementById("modeOfPayment").value != "Cash" && document.getElementById("transaction_id").value == ""){
+        document.getElementById("transaction_id").classList.add("is-invalid");
+        return;
+      }
+      document.getElementById("transaction_id").classList.remove("is-invalid");
+      swal({
+              title: "Confirm",
+              text: "Are you sure?",
+              icon: "warning",
+              buttons: true,
+              dangerMode: true,
+          })
+          .then( willDelete => {
+            if(willDelete){
+              
+              let url = "{% url 'marketer_save_order' %}";
+              let modeOfPayment = document.getElementById("modeOfPayment").value;            
+              let transaction_id = document.getElementById("transaction_id").value;
+              let order_id = localStorage.getItem("order_id");
+              let token = `{{ csrf_token }}`
+  
+              
+              let postData = new FormData();
+              postData.append("order_id", order_id);
+              postData.append("mode_of_pay", modeOfPayment);
+              postData.append("transaction_id", transaction_id);
+              postData.append("csrfmiddlewaretoken", token);
+  
+              fetch(url, {
+                body: postData,
+                method : "POST"
+              })
+              .then(res => {
+                return res.json();
+              })
+              .then( data => {
+                console.log(data);
+                let result = data['result'];
+                let msg = data['msg'];
+                if(result){
+                  // swal({
+                  //     title: "Saved",
+                  //     text: msg,
+                  //     icon: "success",
+                  //     button: "OK"
+                  // });
+                  swal(msg, {
+                  icon: "success",
+                  })
+                  .then( value => {
+                      window.location.reload();
+                  })
+                }
+                else{
+                  swal({
+                      title: "Failure",
+                      text: msg,
+                      icon: "error",
+                      button: "OK"
+                  });
+                }
+              })
+            }
+          })
+      
+      })
+  }
+
+
+  var img = document.querySelector("#myImg");
+var modal = document.getElementById("myModal");
+
+var modalImg = document.getElementById("img01");
+var captionText = document.getElementById("captionz");
+
+img.onclick = function(){
+    modal.style.display = "block";
+    modalImg.src = this.dataset.src;
+    captionText.innerHTML = this.dataset.alt;
+  }
+
+  // Get the <span> element that closes the modal
+var span = document.getElementsByClassName("close")[0];
+
+// When the user clicks on <span> (x), close the modal
+span.onclick = function() { 
+  modal.style.display = "none";
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,213 @@
+{% if orders %}
+{% load convert_filter %}
+<table class="fold-table" id="example">
+    <thead>
+      <tr>
+        <th>Client Type</th>
+        <th>Order ID</th>
+        <th>Total Ads in Order</th>
+        <th>Client Name</th>
+        <th>Marketer Name</th>
+        <th>Bill Status</th>
+        <th>Total Bill Amount</th>
+        <th>Discount Status</th>
+        <th>Discounted Amount</th>
+        <th>Discount Allowed Admin </th>
+        <th>GST Relaxed? </th>
+        <th>GST Accepted/Rejected Admin? </th>
+        <th>If GST Relaxed? Amount Paid? </th>
+        <th>Agency Discount Percent </th>
+        <th>Final Amount (with 18% GST)</th>
+        <th>Order created Date</th>
+        <th>Release Order Status</th>
+        {% comment %} <th>Action</th> {% endcomment %}
+      </tr>
+    </thead>
+    <tbody>
+      
+        {% for order in orders %}
+        
+        <tr class="view">
+            <td>
+              {% if order.client_id.agency_id != None %}
+                Agency Type
+              {% else %}
+                Direct Client
+              {% endif %}
+            </td>
+            <td>{{ order.id }}</td>
+            <td>{{ order.advt_set.all|length }}</td>
+            <td>{{ order.client_id.name }}</td>
+            <td>{{ order.marketer_id.first_name }}</td>
+            <td>{{ order.order_status }}</td>
+            <td><b>{{ order.total_bill_amt|convert_to_inr }}</b></td>
+            <td>
+              {% if order.discount_decision %}
+              Given 
+              {% else %}
+              Not Given
+              {% endif %}
+              
+            </td>
+            <td>
+              {% if order.discount_decision %}
+                <b>{{ order.discount_alloted_amt|convert_to_inr }}</b>
+              {% else %}
+                -
+              {% endif %}
+            </td>
+            <td>
+              {% if order.discount_decision %}
+                {{ order.discount_allowed_or_rejected_admin }}
+              {% else %}
+                - 
+              {% endif %}
+            </td>
+            <td>
+              {% if order.gst_relax_decision == True%}
+                Yes
+              {% elif order.gst_relax_decision == True %}
+                Rejected
+              {% else %}
+                Not Asked
+              {% endif %}
+            </td>
+            <td>
+              {% if order.gst_relax_decision == True%}
+                {{ order.gst_allowed_or_rejected_admin}}
+              {% elif order.gst_relax_decision == True %}
+              No
+              {% else %}
+              - 
+              {% endif %}
+              
+            </td>
+            <td>
+              {% if order.gst_relax_decision == True%}
+              <b>{{ order.final_bill_amt|convert_to_inr }}</b>
+              {% else %}
+              - 
+              {% endif %}
+            </td>
+            <td>
+              {% if order.client_id.agency_id != None %}
+                {{ order.agency_discount_percent }}% <br>
+                Prev Amt : <b>{{ order.b4_agency_discount_bill }}</b> 
+                
+                minus Discount {{ order.agency_discount_amt }}
+               Final Amt : <b>{{ order.final_bill_amt }}</b>
+              {% else %}
+              -
+              {% endif %}
+            </td>
+            <td>
+              {% if order.gst_relax_decision == True%}
+                -
+              {% else %}
+                {% if order.client_id.agency_id != None %}
+                -
+                {% else %}
+                  <b>{{ order.gst_final_bill_amt|convert_to_inr }}</b>
+                {% endif %}
+              {% endif %}
+            </td>
+            <td>{{ order.created }}</td>
+            <td>
+              {% if order.signed_release_order %}
+              Done
+              {% else %}
+              Not Uploaded
+              {% endif %}
+            </td>
+            <td>
+                {% comment %} <a href="{% url 'marketer_edit_order' order.order_id %}">Edit Order</a> {% endcomment %}
+                {% comment %} <a href="{% url 'accountant_edit_order' order.order_id %}">Edit Order</a> {% endcomment %}
+            </td>
+        </tr>
+        {% if order.advt_set.all|length > 0 %}
+      <tr class="fold">
+        <td colspan="10">
+          <div class="fold-content">
+            <!-- <h3>Company Name</h3> -->
+            <!-- <p>Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas.</p> -->
+            <p>Total Ads in this order are as follow: </p>
+            <table>
+              <thead style="font-weight: 600;">
+                <tr>
+                  <th>Ad ID</th>
+                  <th>Ad Locations & Types</th>
+                  <th>Amount</th>
+                  <th>Ad Publishing Date</th>
+                  <th>Publishing Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                  {% for advt in order.advt_set.all %}
+                  
+                    <tr>
+                        <td>{{ advt.id }}</td>
+
+                        <td>
+                          {% for ad_loc in advt.ad_locs.all %}
+                            {{ ad_loc }} <br>
+                          {% endfor %}
+                          </td>
+                        <td>{{ advt.ad_amt }}</td>
+                        <td>{{ advt.ad_pub_date }}</td>
+                        <td>
+                          {% if advt.is_published %}
+                            Published on {{ advt.ad_pub_actual_date }}
+                            {% else %}
+                            Not Published
+                          {% endif %}
+                        </td>
+                        <td>
+                          {% comment %} <a href="#">Edit Advt</a> {% endcomment %}
+                        </td>
+                    </tr>
+                {% endfor  %}
+                
+              </tbody>
+            </table>          
+          </div>
+        </td>
+      </tr>
+      {% endif %}
+      {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<h2>No Orders Found</h2>
+{% endif %}
+
+
+
+
+
+{% comment %} OLD VERSION {% endcomment %}
+{% comment %} <table class='table table-striped' style='position:sticky; top:0;'>
+    <thead class='thead-dark' style='position:sticky; top:0; background-color:#212529; color:white;'>
+      <tr>
+        <th scope='col'>Order Date</th>
+        <th scope='col'>Client Name</th>
+        <th scope='col'>Order Value</th>
+        <th scope='col'>Ads Qty</th>
+        <th scope='col'>Order Status</th>
+        <th scope='col'>Action</th>
+      </tr>
+    </thead>
+    <tbody>
+        {% for obj in objects %}
+        <tr>
+            <td>{{ obj.created }}</td>
+            <td>{{ obj.client_id.name }}</td>
+            <td>{{ obj.total_bill_amt }}</td>
+            <td>{{ obj.advt_set.all|length }}</td>
+            <td>{{ obj.order_status }}</td>
+            <td>
+                <a href="#">Edit</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+  </table> {% endcomment %}

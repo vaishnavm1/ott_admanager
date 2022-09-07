@@ -21,3 +21,7 @@ class MarketerCreateForm(forms.ModelForm):
         model   =   Marketer
         fields  =   ["first_name", "middle_name", "last_name", "district", "taluka", "address", "email", "mobile_no", "password"]
 
+class EditMarketerForm(forms.ModelForm):
+    class Meta:
+        model   =   Marketer
+        fields  =   ["first_name", "middle_name", "last_name", "district", "taluka", "address", "email", "mobile_no"]

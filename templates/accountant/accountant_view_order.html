@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Accountant Home</title>
+    <title>Accountant | View Order</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-0evHe/X+R7YkIZDRvuzKMRqM+OrBnVFBL6DOitfPri4tjfHxaWutUpFmBp4vmVor" crossorigin="anonymous">
     <!-- <link rel="stylesheet" href="{% static "assets/css/style.css" %}" /> -->
     <!-- CSS only -->
@@ -129,6 +129,7 @@
           width: 100%;
         }
       }
+      
 
 
     </style>
@@ -182,6 +183,9 @@
             <h3> 
               There are total <b> <span id="totalAds">{{ order.advt_set.all|length }}<span> Ad(s) </b> in the order of Client <b>{{ order.client_id.name }}</b>
                 Marketer : <b>{{ order.marketer_id }}</b>
+                {% if order.client_id.agency_id != None %}
+                <br>Agency : <span class="badge rounded-pill text-bg-dark">{{ order.client_id.agency_id }}</span>
+              {% endif %}
             </h3>
           </div>
         </div>
@@ -198,10 +202,18 @@
         <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#accordionExample">
           <div class="accordion-body">
             <div class="ad-container" data-id="{{ ad.id }}">
-              <h6>Ad Type : <b>{{ ad.type.title }}</b> <br><h6>
-              <h6>Ad Amount : <b>₹ {{ ad.type.rate }}</b> <br></h6>
+              <h6>Ad Location(s) : <b>
+                Total : {{ ad.ad_locs.all|length }} [{% for x in ad.ad_locs.all %}
+                <i>{{ x.location.name  }}</i> type : {{ x.location.type }} ₹ : {{ x.location.rate }},
+                {% endfor %}]
+              </b> <br><h6>
+                <h6>Ad Amount : <b>₹ {{ ad.ad_amt }}</b> <br></h6>
               <h6>Publishing On : <b>{{ ad.ad_pub_date }}</b></h6>
+              {% if ad.ad_image %}
               <a href="#" id="myImg" data-src='{{ ad.ad_image.url }}'>View Image</a>
+              {% else %}
+              No Image Uploaded for the Advt
+              {% endif %}
               <p></p>
             </div>
             {% comment %} <strong>This is the first item's accordion body.</strong> It is shown by default, until the collapse plugin adds the appropriate classes that we use to style each element. These classes control the overall appearance, as well as the showing and hiding via CSS transitions. You can modify any of this with custom CSS or overriding our default variables. It's also worth noting that just about any HTML can go within the <code>.accordion-body</code>, though the transition does limit overflow. {% endcomment %}
@@ -211,13 +223,69 @@
       {% endfor %}
     </div> {% comment %} END Accordian {% endcomment %}
 
+    {% load convert_filter %}
     <div class="row gx-5 mt-3">
       <div class="col">
         <div class="p-3 border bg-light">
           <h3>
             Total Bill value : 
-            <span id="totalBillAmt">{{ order.total_bill_amt }} </span> 
-            {{ order.order_status }}
+            <span id="totalBillAmt">{{ order.total_bill_amt|convert_to_inr }} </span> 
+            {% if order.discount_decision %}
+              {% if order.gst_relax_decision == True %}
+                    <h5>
+                      Discount given : <b> ₹ {{ order.discount_alloted_amt|convert_to_inr }}</b>
+                    </h5>
+                    <h5>
+                      GST Relax Given, New Bill Amount : <b>₹ {{ order.final_bill_amt|convert_to_inr }}</b>
+                    </h5>
+                    {% if order.client_id.agency_id != None %}
+                      <h5><b>{{ order.agency_discount_percent }}% agency discount given</b></h5>
+                      <h5>{{ order.b4_agency_discount_bill|convert_to_inr }}(Total Bill) - {{ order.agency_discount_amt|convert_to_inr }} ({{ order.agency_discount_percent}}% discount) = <b>₹ {{ order.final_bill_amt|convert_to_inr }}</b></h5>
+                    {% endif %}
+                  
+                    
+                {% else %}
+                    <h5>
+                      Discount given : <b> ₹ {{ order.discount_alloted_amt|convert_to_inr }}</b>  
+                    </h5>
+                    <h6>
+                      New Bill (with discount) : <b>₹ {{ order.final_bill_amt|convert_to_inr }} </b> 
+                    </h6>
+                    
+                    <h7>GST Relax request was rejected</h7>
+                    <h4>
+                      Final Amount Paid (with 18% GST%) : <b>{{ order.gst_final_bill_amt|convert_to_inr }}</b>
+                    </h4>
+                    {% if order.client_id.agency_id != None %}
+                      <h4><b>{{ order.agency_discount_percent }}% agency discount given</b></h4>
+                      <h4>{{ order.b4_agency_discount_bill|convert_to_inr }}(Total Bill) - {{ order.agency_discount_amt|convert_to_inr }} ({{ order.agency_discount_percent}}% discount) = <b>₹ {{ order.final_bill_amt|convert_to_inr }}</b></h4>
+                    {% endif %}
+              {% endif %}
+            {% else %}
+                {% if order.gst_relax_decision == True %}
+                <h6>Discount not given</h6>
+                {% if order.client_id.agency_id != None %}
+                    <h4><b>{{ order.agency_discount_percent }}% agency discount given</b></h4>
+                    <h4>{{ order.b4_agency_discount_bill|convert_to_inr }}(Total Bill) - {{ order.agency_discount_amt|convert_to_inr }} ({{ order.agency_discount_percent}}% discount) = <b>₹ {{ order.final_bill_amt|convert_to_inr }}</b></h4>
+                {% endif %}
+                <h5>
+                  GST Relax Given, New Bill Amount : <b>₹ {{ order.final_bill_amt|convert_to_inr }}</b>
+                </h5>
+
+              
+                {% else %}
+                    <h6>Discount not given</h6>
+                    <h7>GST Relax request was rejected</h7>
+                    
+                    <h4>
+                      Final Amount Paid (with 18% GST%) : <b>{{ order.gst_final_bill_amt|convert_to_inr }}</b>
+                    </h4>
+                    {% if order.client_id.agency_id != None %}
+                      <h4><b>{{ order.agency_discount_percent }}% agency discount given</b></h4>
+                      <h4>{{ order.b4_agency_discount_bill|convert_to_inr }}(Total Bill) - {{ order.agency_discount_amt|convert_to_inr }} ({{ order.agency_discount_percent}}% discount) = <b>₹ {{ order.final_bill_amt|convert_to_inr }}</b></h4>
+                    {% endif %}
+                {% endif %}
+            {% endif %}
           </h3>
         </div>
       </div>
@@ -262,7 +330,27 @@
       
 
       <a href="{% url 'accountant_generate_order_bill' order.order_id %}" class="btn btn-lg btn-warning mt-5">Generate Bill</a>
-      <h3>Client email : {{ order.client_id.email }}</h3>
+      <!-- Trigger -->
+      <div class="input-group">
+        <!--begin::Input-->
+        <div class='row'>
+          <div class="form-group col-md-10">
+            <label for="kt_clipboard_1">Client Email : </label>
+            <input id="kt_clipboard_1" type="text" class="form-control" placeholder="{{ order.client_id.email }}" value="{{ order.client_id.email }}" readonly />
+          </div>
+          <div class="form-group col-md-2">
+            <button class="btn btn-outline-success mt-2" data-clipboard-target="#kt_clipboard_1" id="copyEmailBtn">
+              Copy Email
+            </button>
+          </div>
+        </div>
+        
+        <!--end::Input-->
+
+        <!--begin::Button-->
+        <!--end::Button-->
+    </div>
+    
           {% if order.order_status == order.Status.REJECTED %}
           <div class="mt-2">
             <p>Do you want to confirm the payment request now?</p>
@@ -284,9 +372,46 @@
 
     <!-- JavaScript Bundle with Popper -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js" integrity="sha384-pprn3073KE6tl6bjs2QrFaJGz5/SUsLqktiwsUTF55Jfv3qYSDhgCecCxMW52nD2" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/clipboard@2.0.10/dist/clipboard.min.js"></script>
 <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
 <script>
-    
+  
+  
+if(document.getElementById('kt_clipboard_1') && document.getElementById('copyEmailBtn')){
+  // Select elements
+  const target = document.getElementById('kt_clipboard_1');
+  const button = document.getElementById('copyEmailBtn');
+
+  // Init clipboard -- for more info, please read the offical documentation: https://clipboardjs.com/
+  var clipboard = new ClipboardJS(button, {
+    target: target,
+    text: function() {
+        return target.value;
+    }
+  });
+
+  // Success action handler
+  clipboard.on('success', function(e) {
+    const currentLabel = button.innerHTML;
+
+    // Exit label update when already in progress
+    if(button.innerHTML === 'Copied!'){
+        return;
+    }
+
+    // Update button label
+    button.innerHTML = 'Copied!';
+
+    // Revert button label after 3 seconds
+    setTimeout(function(){
+        button.innerHTML = currentLabel;
+    }, 3000)
+  });
+}
+
+
+
+
     
   let cofirmPaymentBtn = null;
     if(document.getElementById("cofirmPaymentBtn")){
@@ -341,29 +466,56 @@
           if(document.getElementById("declinePaymentBtn")){
             let declinePaymentBtn = document.getElementById("declinePaymentBtn");
             declinePaymentBtn.onclick = function(){
+              let order_id = `{{ order.order_id }}`;
               swal({
-                      title: "Confirm",
-                      text: "Do you really confirm payment has NOT received?",
-                      icon: "warning",
-                      buttons: true,
-                      dangerMode: true,
-                  })
-                  .then( willDelete => {
-                        if(willDelete){
-                          let msg = data['msg'];
-                        if(data["result"]){
-                          swal(msg, {
-                          icon: "success",
+                title: "Confirm",
+                text: "Do you really confirm payment has NOT received?",
+                icon: "warning",
+                buttons: true,
+                dangerMode: true,
+              })
+              .then( willDelete => {
+                if(willDelete){
+                        let rej_msg = prompt("Please enter a rejection message for marketer to see")
+                        
+                        
+                          let url = `{% url 'accountant_decline_payment' %}`;
+                          let token = `{{ csrf_token }}`;
+  
+                          let postData = new FormData();
+                          postData.append("order_id", order_id);
+                          postData.append("csrfmiddlewaretoken", token);
+                          postData.append("reject_msg", rej_msg);
+                          console.log(order_id);
+
+                          fetch(url, {
+                            method : "POST",
+                            body : postData
                           })
-                          .then( value => {
-                              window.location.reload();
+                          .then(res => {
+                            return res.json();
                           })
-                        }
-                        else{
-                          swal(msg, {
-                          icon: "error",
+                          .then(data => {
+                            let result = data['result'];
+                            let msg = data['msg'];
+                            if(result){
+                              if(data["result"]){
+                                swal(msg, {
+                                icon: "success",
+                                })
+                                .then( value => {
+                                    window.location.reload();
+                                })
+                              }
+                              else{
+                                swal(msg, {
+                                icon: "error",
+                                })
+                              }
+                              
+                            }
                           })
-                        }                    
+                                          
                       } 
                   })
                 }
@@ -387,9 +539,17 @@ var captionText = document.getElementById("captionz");
 imgs.forEach( (img)=>{
   
   img.onclick = function(){
-    modal.style.display = "block";
-    modalImg.src = this.dataset.src;
-    captionText.innerHTML = this.dataset.alt;
+    let url = img.dataset.src;
+    if(url.toLowerCase().includes(".png") ||  url.toLowerCase().includes(".jpg") || url.toLowerCase().includes(".jpeg")){
+      modal.style.display = "block";
+      modalImg.src = this.dataset.src;
+      captionText.innerHTML = this.dataset.alt;
+      
+    }
+    else{
+      window.open(url, "_blank");
+
+    }
   }
 
 })

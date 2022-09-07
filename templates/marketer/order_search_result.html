@@ -1,13 +1,21 @@
 {% if orders %}
+{% load convert_filter %}
 <table class="fold-table" id="example">
     <thead>
       <tr>
         <th>Order ID</th>
         <th>Total Ads in Order</th>
+        <th>Client Type</th>
         <th>Client Name</th>
         <th>Marketer Name</th>
-        <th>Total Bill Amount</th>
         <th>Bill Status</th>
+        <th>Total Bill Amount</th>
+        <th>Discount Status</th>
+        <th>Discounted Amount</th>
+        <th>Discount Allowed Admin </th>
+        <th>GST Relax Status</th>
+        {% comment %} <th>Final Amount (with 18% GST)</th> {% endcomment %}
+
         <th>Order created Date</th>
         <th>Release Order Status</th>
         <th>Action</th>
@@ -20,10 +28,41 @@
         <tr class="view">
             <td>{{ order.id }}</td>
             <td>{{ order.advt_set.all|length }}</td>
+            <td>
+              {% if order.client_id.agency_id != None %}
+                Agency : {{ order.client_id.agency_id }}
+              {% else %}
+                Direct Client
+              {% endif %}
+            </td>
             <td>{{ order.client_id.name }}</td>
             <td>{{ order.marketer_id.first_name }}</td>
-            <td>{{ order.total_bill_amt }}</td>
             <td>{{ order.order_status }}</td>
+            <td>{{ order.total_bill_amt|convert_to_inr }}</td>
+            <td>
+              {% if order.discount_decision %}
+              Given 
+              {% else %}
+              Not Given
+              {% endif %}
+
+            </td>
+            <td>{{ order.discount_alloted_amt|convert_to_inr }}</td>
+            <td>
+              {% if order.discount_decision %}
+                {{ order.discount_allowed_or_rejected_admin }}
+              {% else %}
+                - 
+              {% endif %}
+            </td>
+            <td>
+              {% if order.gst_relax_decision == True %}
+                Yes
+              {% else %}
+                No
+              {% endif %}
+            </td>
+            {% comment %} <td><b>{{ order.gst_final_bill_amt|convert_to_inr }}</b></td> {% endcomment %}
             <td>{{ order.created }}</td>
             <td>
               {% if order.signed_release_order %}
@@ -48,7 +87,7 @@
               <thead style="font-weight: 600;">
                 <tr>
                   <th>Ad ID</th>
-                  <th>Ad Type</th>
+                  <th>Ad Location(s)</th>
                   <th>Amount</th>
                   <th>Ad Publishing Date</th>
                   <th>Publishing Status</th>
@@ -60,8 +99,12 @@
                     
                     <tr>
                         <td>{{ advt.id }}</td>
-                        <td>{{ advt.type.title }}</td>
-                        <td>{{ advt.type.rate }}</td>
+                        <td>
+                          {% for x in advt.ad_locs.all %}
+                          <i>{{ x.location.name  }}</i> type : {{ x.location.type }} ₹ : {{ x.location.rate }},
+                          {% endfor %}
+                        </td>
+                        <td>{{ advt.ad_amt }}</td>
                         <td>{{ advt.ad_pub_date }}</td>
                         <td>
                           {% if advt.is_published %}

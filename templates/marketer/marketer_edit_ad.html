@@ -8,6 +8,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Marketer Home</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-0evHe/X+R7YkIZDRvuzKMRqM+OrBnVFBL6DOitfPri4tjfHxaWutUpFmBp4vmVor" crossorigin="anonymous">
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-0evHe/X+R7YkIZDRvuzKMRqM+OrBnVFBL6DOitfPri4tjfHxaWutUpFmBp4vmVor" crossorigin="anonymous">
+    <link rel="stylesheet" href="{% static "css/jquery.datetimepicker.min.css" %}" />
     <!-- <link rel="stylesheet" href="{% static "assets/css/style.css" %}" /> -->
     <!-- CSS only -->
 
@@ -50,13 +53,11 @@
 
   <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
     <div class="container-fluid">
-      <a class="navbar-brand" href="#">OTT Media</a>
+      <a class="navbar-brand" href="{% url 'marketer_edit_ads' %}">OTT Media</a>
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
       <div class="collapse navbar-collapse" id="navbarSupportedContent">
-        
-        
 
         {% comment %} <form class="d-flex" role="search">
           <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
@@ -99,12 +100,26 @@
     <form method="post" enctype="multipart/form-data">
         {% csrf_token %}
         {{ form|crispy}}
+        <br>
+        {% if advt.ad_pub_date == None %}
+        <h5>Select Date & Time for Ad(s) Publishing : </h5>
+        <div class="datetime-boxes">
+        </div>
+        {% else %}
+         Ad Publishing DateTime :  {{ advt.ad_pub_date }}
+         <button class="btn btn-warning btn-sm" type="button" onclick="changeAdDtime(this)">Change DateTime</button>
+        {% endif %}
+        <div class="container-datetime" style="display:none">
+          <h6>Select New DateTime : </h6>
+          <div class="datetime-boxes">
+          </div>
+        </div>
+        <br>
         <input type="submit" class="btn btn-outline-success mt-5" value="Save Changes" />
     </form>
  
       <br><br><br><br><br><br><br><br><br>
   </div>
-  
   
     {% comment %} <script src="{% static "assets/js/util.js" %} "></script>
     <script src="{% static "assets/js/menu-aim.js" %} "></script>
@@ -113,8 +128,110 @@
     <!-- JavaScript Bundle with Popper -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js" integrity="sha384-pprn3073KE6tl6bjs2QrFaJGz5/SUsLqktiwsUTF55Jfv3qYSDhgCecCxMW52nD2" crossorigin="anonymous"></script>
 <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+
+<script src="{% static "js/jquery.js" %}"></script>
+<script src="{% static "js/jquery.datetimepicker.full.min.js" %}"></script>
 <script>
- 
+  
+  function changeAdDtime(ele){
+    if(ele.innerText == "Cancel"){
+      ele.innerText = "Change DateTime";
+      document.querySelector(".container-datetime").style.display = "none";
+      
+    }
+    else{
+      ele.innerText = "Cancel";
+      document.querySelector(".container-datetime").style.display = "block";
+    }
+  }
+  $("#dateAndTimePicker1").datetimepicker({
+    formatTime:'g:iA',
+    // format: 'Y.m.d hh:mm A',
+    // format:'d-m-Y H:i',
+    allowTimes:['7:00', '10:00', '12:30', '15:00', '17:00', '20:00' ], 
+    // minDate:0
+  });
+
+  let date_time_boxes = document.querySelector(".datetime-boxes");
+  let append_ele = "";
+
+
+  append_ele = document.createElement("input");
+  append_ele.id = "ad-datetime";
+  append_ele.name = "dateAndTimePicker1";
+  append_ele.classList.add("form-control")
+  {% comment %} append_ele.required = true; {% endcomment %}
+  
+  let cln = append_ele.cloneNode(true);
+  date_time_boxes.appendChild(cln);
+
+  let all_dt = document.querySelectorAll("#ad-datetime")
+        all_dt.forEach((dt)=>{
+              $(dt).datetimepicker({
+                formatTime:'g:iA',
+                // format: 'Y.m.d hh:mm A',
+                // format:'d-m-Y H:i',
+                allowTimes:['7:00', '10:00', '12:30', '15:00', '17:00', '20:00' ], 
+                // minDate:0
+            });
+        })
+    let form = document.querySelector("form");
+    form.addEventListener("submit", (e)=>{
+      e.preventDefault();
+
+      swal({
+        title: "Confirm",
+        text: "Do you want to save the changes to the advt",
+        icon: "warning",
+        buttons: true,
+        dangerMode: true,
+      })
+      .then( willDelete => {
+        if(willDelete){
+
+          let url = `{% url 'marketer_edit_ad' advt.id %}`;
+          fetch(url, {
+            method : "POST",
+            body: new FormData(form)
+          })
+          .then(res => {
+            return res.json();
+          })
+          .then(data => {
+            let result = data['result'];
+            let message = data['message'];
+            if(result){
+              swal({
+                title: "Saved",
+                text: message,
+                icon: "success",
+                button: "OK"
+              })
+              .then( value => {
+                window.location.reload();
+              })
+            }
+            else{
+              swal({
+                title: "Error",
+                text: message,
+                icon: "error",
+                button: "OK"
+              })
+              .then( value => {
+                window.location.reload();
+              })
+            }
+          })
+
+
+
+
+        }
+      });
+      
+    })
+      
 </script>
 </body>
 </html>

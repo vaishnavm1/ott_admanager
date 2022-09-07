@@ -8,6 +8,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Marketer Home</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-0evHe/X+R7YkIZDRvuzKMRqM+OrBnVFBL6DOitfPri4tjfHxaWutUpFmBp4vmVor" crossorigin="anonymous">
+    <link rel="stylesheet" href="{% static "css/jquery.datetimepicker.min.css" %}" />
+    <link rel="stylesheet" href="{% static "css/tagify.css" %}" />
     <link rel="stylesheet" href="{% static "assets/css/style.css" %}" />
     <style>
       .datetime-boxes input{
@@ -41,13 +43,17 @@
         bottom: 10vh;
         right: 5vw;
       }
+      .cd-main-header, .cd-side-nav, .cd-side__sub-list {
+        background: #212529;
+      }
     </style>
 </head>
 <body>
     <header class="cd-main-header js-cd-main-header">
         <div class="cd-logo-wrapper">
-          <a href="#0" class="cd-logo"><img src="assets/img/cd-logo.svg" alt="OTT Logo"></a>
-          <!-- <a href="#" class="cd-logo">OTT</a> -->
+          <a href="#0" class="cd-logo">
+            <span style="color: white;">OTT Media</span>
+          </a>
         </div>
         
         <div class="cd-reset js-cd-search">
@@ -68,9 +74,9 @@
             </a>
         
             <ul class="cd-nav__sub-list">
-              <li class="cd-nav__sub-item"><a href="#0">My Account</a></li>
-              <li class="cd-nav__sub-item"><a href="#0">Edit Account</a></li>
-              <li class="cd-nav__sub-item"><a href="#0">Logout</a></li>
+              {% comment %} <li class="cd-nav__sub-item"><a href="#0">My Account</a></li>
+              <li class="cd-nav__sub-item"><a href="#0">Edit Account</a></li> {% endcomment %}
+              <li class="cd-nav__sub-item"><a href="{% url 'marketer_logout' %}">Logout</a></li>
             </ul>
           </li>
         </ul>
@@ -95,7 +101,7 @@
               
               <ul class="cd-side__sub-list">
                 <li class="cd-side__sub-item"><a href="{% url 'marketer_add_client' %}">Add Client</a></li>
-                <li class="cd-side__sub-item"><a href="#0"> Edit Client</a></li>
+                {% comment %} <li class="cd-side__sub-item"><a href="#0"> Edit Client</a></li> {% endcomment %}
               </ul>
             </li>
             
@@ -123,21 +129,62 @@
             <h1>Add Advt</h1>
             <form method="POST" id="myForm" enctype="multipart/form-data">
                 <br>
+                <!-- <div class="row">
+                  <div class="form-group col-md-12">
+                    <label for="id_client_type">Select Client Type</label>
+                    <select name="client_type" id="client_type">
+                      <option value=""></option>
+                    </select>
+                  </div>
+                </div> -->
                 Select Client : <select name="client" id="client" class="form-control" onchange="clientChangedEvent(this)" required>
                     <option disabled="" selected="" value="0"> -- Select Client -- </option>
                     {% for client in clients %}
-                    <option value="{{ client.id }}">{{ client.name }}</option>
+                      <option value="{{ client.id }}">
+                        {% if client.agency_id %}
+                          Agency : {{ client.agency_id.agency_name }} ֍
+                        {% else %}
+                        {% endif %}
+                        Client : {{ client.name }}</option>
                     {% endfor %}
                 </select>
                 <br>
                 <div class="main-cont">
                     {% csrf_token %}
                     <div class="ad-details">
+                        {% comment %} {{ form.desc.label  }} {% endcomment %}
+                        {% comment %} {{ form.desc|as_crispy_field  }} {% endcomment %}
                         {{ form|crispy  }}
+                          
+                          <div class="form-group col-md-6 mt-3" id="tags_container" style="">
+                            <label for="location_tags">Select Locations for Advt</label>
+                            <textarea id="location_tags"></textarea>
+                            <div class="invalid-feedback" id="location_tags">
+                              Please select atleast one location
+                            </div>
+                          </div>
+                          <div class="form-check form-switch mt-4 ">
+                            <input class="form-check-input" type="checkbox" role="switch" name="checkLocationMaha" id="checkLocationMaha" onchange="locationFullChanged(this.checked)">
+                            <label class="form-check-label" for="flexSwitchCheckDefault">Show Ad in Full Maharashtra </label>
+                          </div>
+                          <div class="form-group" id="all_mah_ad_rates" style="display: none;">
+                            <label for="">Select Ad Type for All Maharashtra Location</label>
+                            Select Ad Type : 
+                            <select name="full_mah_ad_type" id="full_mah_ad_type" class="form-control" onchange="changedFullMahAd(this)"  required>
+                              <option disabled="" selected="" value="0"> -- Select Ad Type -- </option>
+                              {% load convert_filter %}
+                              {% for m in mah_location %}
+                                <option value="{{ m.type.id }}"> {{ m.type }} | Price : {{ m.rate|convert_to_inr }}</option>
+                              {% endfor %}
+                            </select>
+                          </div>
+
+                          
+                          
                         <!-- <button type="button" id="clearImageBtn">Clear Ad Image</button> -->
                         <br>
                         <!-- <button id="remove-ad" type="button" disabled onclick="removeBtnClick(this)">Remove this Ad</button><br><br> -->
-                        <p>How many times you want to display ad ? </p>
+                        <p>How many ad units you want ? </p>
                         <select class="form-control" name="selectAdShowTimes" id="selectAdShowTimes" onchange="changeAdDisplayTime(this)">
                           <option disabled="" selected="" value="0"> -- Select No of Ads -- </option>
                           <option value="1" selected>1</option>
@@ -160,6 +207,7 @@
                 <br>
             <!-- <button id="add-ad" type="button">Add on more Ad</button> -->
             <input type="hidden" name="order_id" id="order_id">
+            <input type="hidden" name="location_ids[]" id="location_ids">
             {% csrf_token %}
             {% comment %} <input type="submit" name="submit" id="submitBtn" value="Add to Cart" class="my-btn">  <br><br> {% endcomment %}
             <button class="btn mt-4" type="submit" id="submitBtn" style="background-color: #157347; color: white;" type="button">
@@ -178,6 +226,7 @@
               </span>
             </a>
 
+
             {% comment %} <input type="submit" name="submit" id="gotoCartBtn" value="Goto Cart"> {% endcomment %}
             
         </form>
@@ -192,14 +241,79 @@
 </main> <!-- .cd-main-content -->
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js" integrity="sha384-pprn3073KE6tl6bjs2QrFaJGz5/SUsLqktiwsUTF55Jfv3qYSDhgCecCxMW52nD2" crossorigin="anonymous"></script>
-<script src="{% static "assets/js/util.js" %} "></script>
+<script src="{% static "js/jquery.js" %}"></script>
+<script src="{% static "js/jquery.datetimepicker.full.min.js" %}"></script>
+<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+
+
+<script src="{% static "js/tagify.min.js" %} "></script>
+
+
+    <script src="{% static "assets/js/util.js" %} "></script>
     <script src="{% static "assets/js/menu-aim.js" %} "></script>
     <script src="{% static "assets/js/main.js" %} "></script>
     <script>
+
+      
       
       document.getElementById("client").selectedIndex = 0;
+      document.getElementById("full_mah_ad_type").selectedIndex = 0;
+      document.getElementById("checkLocationMaha").checked = false;
+
+      function locationFullChanged(value){
+        if(value == false){
+          document.getElementById("tags_container").style.display = "block";
+          document.getElementById("all_mah_ad_rates").style.display = "none";
+          return;
+        }
+        document.getElementById("tags_container").style.display = "none";
+        document.getElementById("all_mah_ad_rates").style.display = "block";
+        tagify_locations.removeAllTags();
 
 
+        
+
+      }
+
+      function changedFullMahAd(ele){
+        let index = ele.selectedIndex;
+        let current = ele.options[index].text;
+        let val1 = "Youtube Video Success Story";
+        let val2 = "Youtube L Band 30 Days";
+        let val3 = "Youtube Full Screen 30 Days";
+        let targetEle = document.getElementById("selectAdShowTimes");
+        targetEle.innerHTML = "";
+        
+        let opt = document.createElement('option');
+        let cln = null;
+        opt.value = "0";
+        opt.text = "-- Select No of Ads --";
+        opt.disabled = true;
+
+        
+
+        cln = opt.cloneNode(true);
+        targetEle.appendChild(cln);
+
+        if(current.includes(val1) || current.includes(val2) || current.includes(val3)){
+          
+          opt = document.createElement('option');
+          opt.value = 1;
+          opt.text = 1;
+          cln = opt.cloneNode(true);
+          targetEle.appendChild(cln);
+        }
+        else{
+          opt = document.createElement('option');
+          for(let i = 1; i <= 10; i ++){
+            opt.value = i;
+            opt.text = i;
+            cln = opt.cloneNode(true);
+            targetEle.appendChild(cln);
+          }
+        }
+        targetEle.selectedIndex = 0;
+      }
       function clientChangedEvent(ele){
         let client_id = ele.value;
         let url = `{% url 'get_client_order' %}`;
@@ -208,7 +322,7 @@
         postData.append("client_id", client_id);
         postData.append("csrfmiddlewaretoken", token);
         fetch(url, {
-          method : "POST", 
+          method : "POST",
           body : postData
         })
         .then( res=> {
@@ -240,11 +354,40 @@
           view_cart_link.style.display = "inline-flex";
           document.getElementById("cartTotal").innerText = totalAds;
         })
+
+
+        {% comment %} DEMO Fetch request for testing get request {% endcomment %}
+
+        
+
+
+        {% comment %} postData2.append("csrfmiddlewaretoken", token); {% endcomment %}
+
+        {% comment %} fetch(url2, {
+          method : "POST",
+          body: postData2
+        })
+        .then( res => {
+          return res.json();
+        })
+        .then( data => {
+          console.log(data);
+        }) {% endcomment %}
+        
       }
       
 
       document.getElementById("selectAdShowTimes").selectedIndex = 0;
 
+
+      $("#dateAndTimePicker1").datetimepicker({
+        formatTime:'g:iA',
+        // format: 'Y.m.d hh:mm A',
+        // format:'d-m-Y H:i',
+        allowTimes:['7:00', '10:00', '12:30', '15:00', '17:00', '20:00' ], 
+        // minDate:0
+      });
+      // alert($("#dateAndTimePicker1").val());
       function changeAdDisplayTime(ele){
         // let append_ele = '<input type="datetime-local" id="ad-datetime" name="ad-datetime">';
 
@@ -252,19 +395,74 @@
         let append_ele = "";
         let date_time_boxes = document.querySelector(".datetime-boxes");
         date_time_boxes.innerHTML = "";
+        
+        // <input name="dateAndTimePicker1" id="dateAndTimePicker1" class="form-control" />
+
         for(let i = 0; i < no_of_ads; i++){
+
+          // Ver 2
           append_ele = document.createElement("input");
-          append_ele.type = "datetime-local";
           append_ele.id = "ad-datetime";
-          append_ele.name = "ad-datetime";
+          append_ele.name = "dateAndTimePicker1";
           append_ele.classList.add("form-control")
-          append_ele.required = true;
+          {% comment %} append_ele.required = true; {% endcomment %}
           
           let cln = append_ele.cloneNode(true);
           date_time_boxes.appendChild(cln);
 
+
+
+          // Ver 1
+          // append_ele = document.createElement("input");
+          // append_ele.type = "datetime-local";
+          // append_ele.id = "ad-datetime";
+          // append_ele.name = "ad-datetime";
+          // append_ele.classList.add("form-control")
+          // append_ele.required = true;
+          
+          // let cln = append_ele.cloneNode(true);
+          // date_time_boxes.appendChild(cln);
+
         }
+        let all_dt = document.querySelectorAll("#ad-datetime")
+        all_dt.forEach((dt)=>{
+              $(dt).datetimepicker({
+                formatTime:'g:iA',
+                // format: 'Y.m.d hh:mm A',
+                // format:'d-m-Y H:i',
+                allowTimes:['7:00', '10:00', '12:30', '15:00', '17:00', '20:00' ], 
+                // minDate:0
+            });
+        })
+         
       }
+
+
+      
+        var input_locations = document.querySelector("#location_tags");
+        var tagify_locations = new Tagify(input_locations, {
+            whitelist : [],
+            enforceWhitelist : true,
+            dropdown: {
+                enabled : 0,
+                maxItems: 20
+            }
+        });
+
+        // If an district is added
+        tagify_locations.on('add', function(e){
+          document.querySelector("#location_tags").classList.remove('is-invalid');
+        });
+
+        var locations = Array();
+        // tagify.loading(false).dropdown.show.call(tagify, "")
+        `{% for location in locations %}`
+        locations.push({value : `{{ location.name }} | {{ location.type }} | {{ location.rate }}`, id : `{{ location.id }}`});
+        `{% endfor %}`
+        var location_length = `{{ locations|length }}`;
+        tagify_locations.settings.whitelist.splice(0, location_length, ...locations);
+
+
 
         // document.getElementById("remove-ad").disabled = true
 
@@ -281,7 +479,6 @@
 
         let myForm = document.getElementById("myForm");
         myForm.addEventListener("submit", (e)=>{
-            let form = document.getElementById("");
             e.preventDefault();
             if(document.getElementById("client").selectedIndex == 0){
               alert("Please select and client!");
@@ -292,13 +489,33 @@
               return;
             }
             
-            if(document.getElementById("id_type").selectedIndex == 0){
-              alert("Please select Ad Type")
-              return;
-            }
-
-
             
+            let locations_ids = 0;
+            let full_mah = false;
+            let full_mah_ad_type = null;
+            if(document.getElementById("checkLocationMaha").checked){
+              locations_ids = 0;
+              full_mah = true;
+              full_mah_ad_type = document.getElementById("full_mah_ad_type")
+            }
+            else{
+              if(tagify_locations.value.length < 1){
+                document.querySelector("#location_tags").classList.add('is-invalid');
+                return;
+              }
+
+              if(tagify_locations.value.length > 1){
+                locations_ids = getIds(tagify_locations.value);
+                console.log("greter than 1");
+              }
+              else{
+                locations_ids = tagify_locations.value[0]['id'];
+              }
+              
+            }
+            if(!document.getElementById("id_ad_image").value){
+             alert("No Image is selected");
+            }
 
 
             let submitBtn = document.getElementById("submitBtn");
@@ -307,7 +524,12 @@
             {% comment %} let all_ads = document.querySelectorAll(".ad-details");
             let msg = "Total Ads " + all_ads.length; {% endcomment %}
             let url = `{% url 'marketer_save_ad' %}`;
+
             myForm.querySelector("#order_id").value = localStorage.getItem("order_id");
+            myForm.querySelector("#location_ids").value = locations_ids;
+
+
+
             fetch(url,{
               "method": "POST",
               "body": new FormData(myForm)
@@ -326,14 +548,34 @@
                 document.getElementById("cartTotal").innerText = totalAds;
                 document.getElementById("id_desc").value = "";
                 document.getElementById("id_ad_image").value = "";
-                document.getElementById("id_type").selectedIndex = 0;
                 document.getElementById("selectAdShowTimes").selectedIndex = 0;
                 
                 document.querySelector(".datetime-boxes").innerHTML = "";
+
+                document.getElementById("full_mah_ad_type").selectedIndex = 0;
+
+                swal(msg, {
+                  icon: "success",
+                })
+                tagify_locations.removeAllTags();
               }
-              alert(msg);
+              else{
+                swal(msg, {
+                  icon: "error",
+                })
+              }
             })
+
+
         })
+
+        function getIds(x){
+          var temp = Array()
+          x.forEach( (e) => {
+              temp.push(e.id);
+          })
+            return temp;
+        }
         
         // let addAdBtn = document.getElementById("add-ad");
         // addAdBtn.addEventListener("click", (e)=>{

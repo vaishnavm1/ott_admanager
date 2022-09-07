@@ -14,6 +14,10 @@ def should_be_marketer():
             password    =   request.user.password
             try:
                 marketer = Marketer.objects.get(email = email, password = password)
+                # Check marketer status
+                if(marketer.is_active == False):
+                    return redirect("marketer_login")
+
             except Marketer.DoesNotExist:
                 return redirect("marketer_login")
             return view_func(request, *args, **kwargs)

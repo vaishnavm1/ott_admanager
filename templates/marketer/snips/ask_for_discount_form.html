@@ -1,0 +1,27 @@
+<br>
+<p style="display: inline-block;">Do you want to give this client discount?</p>
+            <button class="btn btn-primary" id="confirmYesDiscountBtn">Yes</button>
+            <div class="row discount-allow-container" style="display: none;">
+              <div class="form-group col-md-6">
+                <label for="discounted_amt">Enter discount you want to give</label>
+                <input type="number" class="form-control" name="discounted_amt" id="discounted_amt" value="0" onkeyup="keyDownDiscountAmt(event)" />
+                <div id="discounted_amt" class="invalid-feedback">
+                  Discount Amount should be less than Orignal Amount
+                </div>
+              </div>
+              <div class="form-group col-md-5">
+                <label for="finalAmt">Final Amount will be</label>
+                <h4 id="finalAmt">{{ order.total_bill_amt }}</h4>
+              </div>
+              <div class="form-group col-md-1">
+                <button class="btn btn-danger btn-sm" id="cancelDiscountBtn">Cancel Discount</button>
+              </div>
+              <div class="row">
+                <div class="form-group col-md-4 mt-4">
+                  <button class="btn btn-primary btn-sm" onclick="submitDiscountRequest()">Submit a Discount Request</button>
+                </div>
+                <div class="form-group col-md-4 mt-4">
+                  (Discount request may be Accepted or Rejected in a timeline of 24-36 hours)
+                </div>
+              </div>
+            </div>

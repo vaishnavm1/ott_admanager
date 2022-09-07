@@ -1,0 +1,260 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <style>
+            *{
+                font-family: Arial, Helvetica, sans-serif;
+            }
+            body{
+                padding-left: 20px;
+                padding-right: 20px;
+            }
+            header{
+                display: -webkit-box;
+            }
+            #tabLabel{
+                position: fixed;
+                top: 10px;
+                right: 10%;
+                font-size: 1.5rem;
+            }
+            header .brand-container{
+                margin-left: 40px;
+            }
+            header .brand-container .brand-title {
+                font-size: 2rem;
+            }
+            .table-section {
+                font-family: Arial, Helvetica, sans-serif;
+                border-collapse: collapse;
+                width: 100%;
+                border: 1px solid black;
+                /* margin: 0 auto; */
+            }
+            .table-section table{
+                width: 100%;
+                border: none;
+                
+            }
+
+            .table-section td, .table-section th {
+                border: 1px solid #ddd;
+                border-top: none;
+                border-right: none;
+                padding: 8px;
+            }
+
+            .table-section tr:nth-child(even){
+                /* background-color: #e0dcdc; */
+            }
+
+            .table-section tr:hover {background-color: #ddd;}
+
+            .table-section th {
+                padding-top: 12px;
+                padding-bottom: 12px;
+                text-align: left;
+                background-color: #CCCCFF;
+                color: black;
+            }
+            .first-half {
+                float: left;
+                width: 50%;
+                
+            }
+            .second-half {
+                float: right;
+                width: 50%;
+                
+            }
+            {% comment %} #totalLine{
+                width: 130%;
+                height: 2px;
+                background-color: black;
+                position: absolute;
+                right: -20%;
+                
+            } {% endcomment %}
+
+        </style>
+    </head>
+<body>
+<header>
+    <div class="img-container" style="margin-top: 10px;">
+        <img src="https://join.onthistime.news/static/images/ott_logo.png" alt="OTT Image" width="110" height="70">
+    </div>
+    <div class="brand-container">
+        <span class="brand-title" style="font-size: 1.4rem;"><b> On This Time Media Pvt. Ltd.</b></span>
+        <div class="brand-address">
+            <span>Second Floor Sai Midas Touch, Near Nagar Manmad Road,</span><br>
+            <span>Opp. Patiyala House, Savedi, Ahmednagar, Maharashtra 414003</span><br>
+            <span>Mob.: 7083887191, 9762217443 Email: innerbit.nagar@gmail.com</span><br>
+            <span>GSTIN: 27APOPD7323M1Z</span>
+        </div>
+    </div>
+    <span id="tabLabel">TAX INVOICE</span>
+</header>
+<hr>
+<div class="container" style="position: relative;">
+    <div class="client-details">
+        <span>To,</span><br>
+        
+            {% if order.client_id.agency_id != None %}
+                <span>{{ order.client_id.agency_id.agency_name }}</span>
+                <div class="client-address" style=" width: 150px;">
+                    {{ order.client_id.agency_id.agency_address }}
+                </div>
+                <span>{{ order.client_id.agency_id.agency_taluka}} 
+                    {{ order.client_id.agency_id.agency_district }}
+                </span>
+                <br>
+                <span>
+                    Mobile : {{ order.client_id.agency_id.agency_mobile_no }} 
+                    WhatsApp : {{ order.client_id.agency_id.agency_whatsapp_mobile_no }}
+                </span>
+            {% else %}
+                <span>{{ order.client_id.name }}</span>
+                <div class="client-address" style=" width: 150px;">
+                    {{ order.client_id.address }}
+                </div>
+                <span>{{ order.client_id.taluka}} {{ order.client_id.district }}</span><br>
+                <span>
+                    Mobile : {{ order.client_id.mobile_no }} 
+                    WhatsApp : {{ order.client_id.whatsapp_mobile_no }}
+                </span>
+            {% endif %}
+        
+    </div>
+    <span style="position: absolute; top: 10%; right: 10%;">Date : {{ order.payment_accepted_datetime }}</span>
+    <br>
+    <div class="table-section">
+        <table border="1" cellpadding="10" width="100%">
+            <thead>
+                <th>LOCATIONS</th>
+                <th>SCHEDULED DATE & TIME</th>
+                <th>AMOUNT</th>
+            </thead>
+            <tbody>
+
+                {% for advt in order.advt_set.all %}
+                <tr>
+                    <td>
+                        {% for x in advt.ad_locs.all %}
+                            {{ x.location.name }} {{ x.location.type }} {{ x.location.rate }}
+                        {% endfor %}
+                    </td>
+                    <td>{{ advt.ad_pub_date }}</td>
+                    <td>{{ advt.ad_amt }}</td>
+                </tr>
+                {% endfor %}
+
+                <tr>
+                    
+                    <td colspan="2" style='text-align:right'>Total : </td>
+                    <td> {{ total_bill_amt }}</td>
+                </tr>
+                {% if discounted_amt  %}
+                    <tr>
+                        <td colspan="2" style='text-align:right'>Discount</td>
+                        <td>{{ discounted_amt }}</td>
+                    </tr>
+                    <tr>
+                        <td colspan="2" style='text-align:right'>Gross Amt</td>
+                        <td>{{ gross_amt }}</td>
+                    </tr>
+                {% endif %}
+                {% if order.gst_relax_decision == True %} 
+                <tr>
+                    <td colspan="2" style='text-align:right'>GST Relaxed</td>
+                    <td>-</td>
+                </tr>
+                {% if order.client_id.agency_id != None %}
+                    <tr>
+                        <td colspan="2" style='text-align:right'>Agency Discount ({{ order.agency_discount_percent }})</td>
+                        <td>{{ order.agency_discount_amt }}</td>                        
+                    </tr>
+                {% endif %}
+                <tr>
+                    <td colspan="2" style='text-align:right'>Net Amt</td>
+                    <td><b>{{ final_bill_amt }}</b></td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="2" style='text-align:right'>18% GST</td>
+                    <td>{{ gst_amt }} = {{ gst_final_bill_amt }}</td>
+                </tr>
+                    {% if order.client_id.agency_id != None %}
+                        <td colspan="2" style='text-align:right'>Agency Discount {{ order.agency_discount_percent }}%  </td>
+                        <td> {{ agency_discount_amt }} </td>
+                        <tr>
+                            <td colspan="2" style='text-align:right'>Net Amt</td>
+                            <td><b> {{ final_bill_amt }} </b></td>
+                        </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="2" style='text-align:right'>Net Amt</td>
+                        <td><b>{{ gst_final_bill_amt }}</b></td>
+                    </tr>
+                    {% endif %}
+                {% endif %}
+                
+                <tr style="position: relative;">
+                        <td colspan="3">
+                            Bill Amount in Words :  <br>
+                            <b> {{ final_amt_words }}</b>
+                            <span style="position: absolute; right: 10%; font-size: 0.91rem;">E & O E</span>
+                        </td>
+                    <!-- <td>E & O E</td> -->
+                </tr>
+                <tr>
+                    <td colspan="3"><u> Note:</u> While remitting through Bank, issue Account payee Cheque/ drafts favoring of "<b>On This Time Media Pvt. Ltd.</b>"</td>
+                </tr>
+                <tr>
+                    <td colspan="3">
+                        <div class="first-half" style="position: relative;">
+                            <u>Declaration</u><br>
+                            We declare that this invoice shows the actual price of the
+                            goods described and that all particulars are true and
+                            correct.
+                            <span style="position: absolute; right: 1%; top: 0;width: 1px; height: 98px; background-color: black;"></span>
+                        </div>
+                        <div class="second-half">
+                            <b><u>Bank Details:</u></b> <br>
+                            Bank  : <span style="margin-left: 50px;">IDBI Bank</span><br>
+                            Account No  : <span style="margin-left: 8px;">1234545</span><br>
+                            Branch  : <span style="margin-left: 40px;">Savedi</span><br>
+                            IFSC  : <span style="margin-left: 50px;">IDBI2354545</span><br>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="3">
+                        <div class="first-half" style="position: relative;">
+                            Customer's Seal and Signature
+                            <br><br><br><br><br><br>
+                            <span style="position: absolute; right: 1%; top: -15%;width: 1px; height: 143px; background-color: black;"></span>
+                        </div>
+                        <div class="second-half" style="position: relative;">
+                            <span style="position: absolute; right: 0; top: 0;"><b>For</b></span>
+                            <br><br><br><br><br><br>
+                            <span style="position: absolute; right: 0; bottom: 0;"><b>Authorized Signature</b></span>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <!-- <div class="amount-section" style="position: absolute; bottom: -32%; right: 4%;">
+        <span id="totalLine" style="bottom: 101%; "></span>
+        <span>4,00,000</span><br>
+        <span>Discount : 30,000 </span><br>
+        <span>18% GST : 66, 600 </span><br><br>
+
+        <span>Final Bill : <b>4,36,600</b></span>
+    </div> -->
+ 
+</div>
+</body>
+</html>

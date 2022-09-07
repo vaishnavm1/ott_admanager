@@ -1,247 +1,8 @@
+{% include "user_admin/navbar.html" with active="home" %}
+
 {% load static %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Accountant Home</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-0evHe/X+R7YkIZDRvuzKMRqM+OrBnVFBL6DOitfPri4tjfHxaWutUpFmBp4vmVor" crossorigin="anonymous">
-    <link rel="stylesheet" href="{% static "css/tagify.css" %}" />
-    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
-    <!-- <link rel="stylesheet" href="{% static "assets/css/style.css" %}" /> -->
-    <!-- CSS only -->
-
-    <style> 
-      @media only screen and (min-width: 600px) {
-        #logoutBtn{
-          position: absolute;
-          right: 10px;
-          top:10;
-        }
-        #myDropdown{
-          position: absolute;
-          right: 10vw;
-          top:10px;
-        }
-      }
-      
-
-      #myImg {
-        border-radius: 5px;
-        cursor: pointer;
-        transition: 0.3s;
-      }
-      
-      #myImg:hover {opacity: 0.7;}
-      
-      /* The Modal (background) */
-      .modalz {
-        display: none; /* Hidden by default */
-        position: fixed; /* Stay in place */
-        z-index: 1; /* Sit on top */
-        padding-top: 100px; /* Location of the box */
-        left: 0;
-        top: 0;
-        width: 100%; /* Full width */
-        height: 100%; /* Full height */
-        overflow: auto; /* Enable scroll if needed */
-        background-color: rgb(0,0,0); /* Fallback color */
-        background-color: rgba(0,0,0,0.9); /* Black w/ opacity */
-      }
-      
-      /* Modal Content (image) */
-      .modalz-content {
-        margin: auto;
-        display: block;
-        width: 80%;
-        max-width: 700px;
-      }
-      
-      /* Caption of Modal Image */
-      #caption {
-        margin: auto;
-        display: block;
-        width: 80%;
-        max-width: 700px;
-        text-align: center;
-        color: #ccc;
-        padding: 10px 0;
-        height: 150px;
-      }
-      
-      /* Add Animation */
-      .modalz-content, #caption {  
-        -webkit-animation-name: zoom;
-        -webkit-animation-duration: 0.6s;
-        animation-name: zoom;
-        animation-duration: 0.6s;
-      }
-      
-      @-webkit-keyframes zoom {
-        from {-webkit-transform:scale(0)} 
-        to {-webkit-transform:scale(1)}
-      }
-      
-      @keyframes zoom {
-        from {transform:scale(0)} 
-        to {transform:scale(1)}
-      }
-      
-      /* The Close Button */
-      .close {
-        position: absolute;
-        top: 15px;
-        right: 35px;
-        color: #f1f1f1;
-        font-size: 40px;
-        font-weight: bold;
-        transition: 0.3s;
-      }
-      
-      .close:hover,
-      .close:focus {
-        color: #bbb;
-        text-decoration: none;
-        cursor: pointer;
-      }
-      
-      /* 100% Image Width on Smaller Screens */
-      @media only screen and (max-width: 700px){
-        .modalz-content {
-          width: 100%;
-        }
-      }
-
-      
-@import url("https://netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css");
-.pcs:after {
-  content: " pcs";
-}
-
-.cur:before {
-  content: "$";
-}
-
-.per:after {
-  content: "%";
-}
-
-      table {
-        width: 100%;
-      }
-      table th {
-        text-align: left;
-        border-bottom: 1px solid #ccc;
-      }
-      table th, table td {
-        padding: 0.4em;
-      }
-      
-      table.fold-table > tbody > tr.view td, table.fold-table > tbody > tr.view th {
-        cursor: pointer;
-      }
-      table.fold-table > tbody > tr.view td:first-child,
-      table.fold-table > tbody > tr.view th:first-child {
-        position: relative;
-        padding-left: 20px;
-      }
-      table.fold-table > tbody > tr.view td:first-child:before,
-      table.fold-table > tbody > tr.view th:first-child:before {
-        position: absolute;
-        top: 50%;
-        left: 5px;
-        width: 9px;
-        height: 16px;
-        margin-top: -8px;
-        font: 16px fontawesome;
-        color: #999;
-        {% comment %} content: "V"; {% endcomment %}
-        transition: all 500ms ease;
-      }
-      table.fold-table > tbody > tr.view:nth-child(4n-1) {
-        transition-duration: 500ms;
-        background: #eee;
-      }
-      table.fold-table > tbody > tr.view:hover {
-        background: rgb(102, 101, 101);
-        color: white;
-      }
-      table.fold-table > tbody > tr.view.open {
-        background: rgb(102, 101, 101);
-        /* background: tomato; */
-        color: white;
-      }
-      table.fold-table > tbody > tr.view.open td:first-child:before, table.fold-table > tbody > tr.view.open th:first-child:before {
-        transform: rotate(-180deg);
-        color: #333;
-      }
-      table.fold-table > tbody > tr.fold {
-        display: none;
-      }
-      table.fold-table > tbody > tr.fold.open {
-        display: table-row;
-      }
-      
-      .fold-content {
-        padding: 0.5em;
-      }
-      .fold-content h3 {
-        margin-top: 0;
-      }
-      .fold-content > table {
-        border: 2px solid #ccc;
-      }
-      .fold-content > table > tbody tr:nth-child(even) {
-        background: #eee;
-      }
-
-
-    </style>
-</head>
-<body>
-
-  <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-    <div class="container-fluid">
-      <a class="navbar-brand" href="#">OTT Media</a>
-      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-      </button>
-      <div class="collapse navbar-collapse" id="navbarSupportedContent">
-        
-        
-
-        {% comment %} <form class="d-flex" role="search">
-          <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
-          <button class="btn btn-outline-success" type="submit">Search</button>
-        </form>  {% endcomment %}
-
-        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-          {% comment %} <li class="nav-item">
-            <a class="nav-link active" aria-current="page" href="#">Home</a>
-          </li> {% endcomment %}
-          
-          <li class="nav-item dropdown" id="myDropdown">
-            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-              Hi {{ request.user.first_name }}
-            </a>
-            <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-              <li><a class="dropdown-item" href="#">Manage Account</a></li>
-              {% comment %} <li><hr class="dropdown-divider"></li> {% endcomment %}
-              <li><a class="dropdown-item" href="{% url 'user_admin_logout' %}">Logout</a></li>
-            </ul>
-          </li>
-          
-        </ul> 
-        {% comment %} <a href="logout.php" class="btn btn-outline-success" id="logoutBtn">Logout</a> {% endcomment %}
-        
-        
-
-      </div>
-    </div>
-  </nav>
-
-  <div class="container my-3">
+  <div class="my-3" style="margin: 0 5vw;">
+      <h3>Search Orders</h3>
       <div class="row">
         <div class="form-group col-md-6">
             <label for="marketer_tags">Select Marketer</label>
@@ -265,9 +26,22 @@
       </div>
             
         <input type="submit" value="Search" id="searchBtn" class="btn btn-success btn-lg mt-3">
+        <form  method="post" action="{% url 'download_order_to_pdf'  %}" id="downloadForm" style="display: none;">
+          <input type="hidden" name="resultIds" value="" id="resultIds">
+          <input type="hidden" name="down_start_date_time" value="" id="down_start_date_time">
+          <input type="hidden" name="down_end_date_time" value="" id="down_end_date_time">
+          <input type="hidden" name="down_marketer" value="" id="down_marketer">
+          <input type="hidden" name="down_client" value="" id="down_client">
+          {% csrf_token %}
+          <input type="submit" value="Download Result in PDF" id="downloadPdfBtn" class="btn btn-warning btn-lg mt-3">
+        </form>
     <!-- </form> -->
-    <div class="search-result mt-3" style="height: 450px; overflow: auto; margin-top: 3vh;">
+    <div class="search-result mt-3" style="max-height: 450px; overflow: auto; margin-top: 3vh;">
 
+    </div>
+    <div class="search-result-summary" style="">
+      <h3 id="totalOrders"></h3>
+      <h3 id="totalBillAmt"></h3>
     </div>
     <div class="" id="spinner-container" style="height: 100%;display:none;  justify-content: center; align-items: center; position: absolute; top: 40%; right: 50%;">
       <div class="spinner-border" role="status" style="width: 100px; height: 100px; font-size: 1.4rem;">
@@ -436,9 +210,10 @@
           })
         } 
       
-      
+      let responseIds = Array();
       let searchBtn = document.getElementById("searchBtn");
       searchBtn.addEventListener("click", (e)=>{
+        document.getElementById("downloadForm").style.display = "none";
         let marketer_id = 0;
         if(tagify_marketer.value.length > 0){
             marketer_id = tagify_marketer.value[0]['id'];
@@ -454,7 +229,7 @@
 
         document.querySelector(".search-result").innerHTML = "";
         document.querySelector('#spinner-container').style.display = "block";
-        
+        document.querySelector(".search-result-summary").style.display = "none";
 
 
         
@@ -471,6 +246,8 @@
         postData.append("start_date_time", start_date_time);
         postData.append("end_date_time", end_date_time);
 
+        
+
 
         fetch(url, {
             body : postData,
@@ -481,8 +258,29 @@
         })
         .then(data => {
           document.querySelector('#spinner-container').style.display = "none";
-            let html = data['html'];
-            document.querySelector(".search-result").innerHTML = html;
+          let html = data['html'];
+          let totalOrders = data['total_orders'];
+          let totalBillAmt = data['total_bill_amt'];
+          document.querySelector(".search-result").innerHTML = html;
+          
+          document.querySelector(".search-result-summary").style.display = "block";
+          document.getElementById("totalOrders").innerText = "Total Orders : " + totalOrders;
+          document.getElementById("totalBillAmt").innerText = "Total Amount : " + totalBillAmt;
+          
+          if(totalOrders < 1){
+            return;
+          }
+            document.getElementById("downloadForm").style.display = "block";
+
+            responseIds = data['qs_ids_json'];
+            console.log(responseIds);
+            document.querySelector("#resultIds").value = responseIds
+            document.querySelector("#down_start_date_time").value = start_date_time
+            document.querySelector("#down_end_date_time").value = end_date_time
+
+            document.querySelector("#down_marketer").value = marketer_id
+            document.querySelector("#down_client").value = client_id
+
             $(function(){
                 $(".fold-table tr.view").on("click", function(){
                   $(this).toggleClass("open").next(".fold").toggleClass("open");
@@ -491,6 +289,37 @@
         })
 
       })
+
+
+let downloadPdfBtn = document.getElementById('downloadPdfBtn');
+downloadPdfBtn.addEventListener("click", (e)=>{
+  let url = `{% url 'download_order_to_pdf' %}`;
+  let token = `{{ csrf_token }}`;
+  {% comment %} marketer_id
+  client_id {% endcomment %}
+
+
+
+
+  let postData = new FormData();
+
+  {% comment %} postData.append("responseIds", JSON.stringify(responseIds))
+  postData.append("csrfmiddlewaretoken", token);
+  postData.append("start_date_time", start_date_time);
+  postData.append("end_date_time", end_date_time); {% endcomment %}
+
+
+  fetch(url, {
+    method : "POST",
+    body: postData
+  })
+  .then(res=>{
+    return res.json();
+  })
+  .then( data => {
+    console.log(data);
+  })
+})
 
       function getIds(x){
         var temp = Array()

@@ -1,0 +1,204 @@
+{% load crispy_forms_tags %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-0evHe/X+R7YkIZDRvuzKMRqM+OrBnVFBL6DOitfPri4tjfHxaWutUpFmBp4vmVor" crossorigin="anonymous">
+    <style>
+        @media only screen and (min-width: 600px) {
+        #logoutBtn{
+          position: absolute;
+          right: 10px;
+          top:10;
+        }
+        #myDropdown{
+          position: absolute;
+          right: 10vw;
+          top:10px;
+          
+        }
+      }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container-fluid">
+          <a class="navbar-brand" href="#">OTT Media</a>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+          </button>
+          <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            
+            
+    
+            {% comment %} <form class="d-flex" role="search">
+              <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
+              <button class="btn btn-outline-success" type="submit">Search</button>
+            </form>  {% endcomment %}
+    
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+              {% comment %} <li class="nav-item">
+                <a class="nav-link active" aria-current="page" href="#">Home</a>
+              </li> {% endcomment %}
+              
+              <li class="nav-item dropdown" id="myDropdown">
+                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                  Hi {{ request.user.first_name }}
+                </a>
+                <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                    {% comment %}<li><a class="dropdown-item" href="#">Manage Account</a></li>
+                   <li><hr class="dropdown-divider"></li> {% endcomment %}
+                  <li><a class="dropdown-item" href="{% url 'accountant_logout' %}">Logout</a></li>
+                </ul>
+              </li>
+              
+            </ul> 
+            
+            
+    
+          </div>
+        </div>
+      </nav>
+    <div class="container my-3">
+        <div class="row gx-5">
+            <div class="col">
+              <h3></h3>
+              <h1 class="display-5">Edit Marketer</h1>
+                <h3 class="display-7">
+                {% if is_active %}
+                  Account Status: <span class="badge bg-success">Active</span>
+                  {% else %}
+                  Account Status: <span class="badge bg-danger">Deactivated</span>
+                {% endif %}
+                </h3>
+              
+            </div>
+        </div>
+        <div>
+            <form method="post">
+                {{ form|crispy }}
+                {% csrf_token %}
+                <!-- <input type="submit" class="btn btn-outline-success" value="Save Changes"> -->
+                <div style="display: flex; justify-content: space-between;">
+                  <button type="submit" class="btn btn-lg btn-outline-success mt-4" id="searchBtn" >
+                    Save Changes
+                  </button>
+                  {% if is_active %}
+                    <button type="button" class="btn btn-lg btn-outline-danger mt-4" id="deactivateBtn" >
+                      Deactivate Account
+                    </button>
+                    {% else %}
+                      {% comment %} <button type="button" class="btn btn-lg btn-outline-warning mt-4" id="activateBtn" >
+                        Activate Account
+                      </button> {% endcomment %}
+                  {% endif %}
+                </div>
+                </form>
+        </div>
+    </div>
+    
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js" integrity="sha384-pprn3073KE6tl6bjs2QrFaJGz5/SUsLqktiwsUTF55Jfv3qYSDhgCecCxMW52nD2" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+<script>
+    let form = document.querySelector("form");
+    let searchBtn = document.getElementById("searchBtn");
+    form.addEventListener("submit", (e)=>{
+        e.preventDefault();
+        let url = "{% url 'edit_marketer' id  %}";
+        searchBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Saving Changes... ';
+        searchBtn.disabled = true;
+        fetch(url, {
+            method : "POST",
+            body : new FormData(form)
+        })
+        .then(res => {
+            return res.json();
+        })
+        .then(data =>{
+            searchBtn.disabled = false;
+            searchBtn.innerHTML = 'Save Changes';
+            let result = data['result'];
+            let msg = data['msg'];
+            if(result){
+                swal(msg, {
+                    icon: "success",
+                })
+                .then( value => {
+                    window.location.reload();
+                })
+            }
+            else{
+                swal(msg, {
+                    icon: "error",
+                })
+            }
+        })
+    })
+    if(document.getElementById("deactivateBtn")){
+
+      let deactivateBtn = document.getElementById("deactivateBtn");
+    deactivateBtn.addEventListener("click", (e)=>{
+      let text = "Do you really want to deactivate account of {{ name }} ?";
+      swal({
+        title: "Confirm",
+        text: text,
+        icon: "warning",
+        buttons: true,
+        dangerMode: true,
+      })
+      .then( willDelete => {
+        
+        if(willDelete){
+          deactivateBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Deactivating Account... ';
+          deactivateBtn.disabled = true;
+          let url = `{% url 'deactivate_marketer_account' %}`;
+              let token = '{{ csrf_token }}';
+              let id = '{{ id }}';
+
+              let postData = new FormData();
+              
+              postData.append("csrfmiddlewaretoken", token);
+              postData.append("id", id);
+              
+              fetch(url, {
+                body: postData,
+                method : "POST"
+              })
+              .then(res => {
+                return res.json();
+              })
+              .then(data => {
+                deactivateBtn.innerHTML = 'Deactivate Account';
+                deactivateBtn.disabled = false;
+                let result = data['result'];
+                let msg = data['msg'];
+                if(result){
+                    swal(msg, {
+                        icon: "success",
+                    })
+                    .then( value => {
+                        window.location.reload();
+                    })
+                }
+                else{
+                  swal(msg, {
+                    icon: "error",
+                })
+
+                }
+              })
+        }
+      });
+    })
+
+
+
+    }
+    
+</script>
+</body>
+</html>

@@ -1,13 +1,23 @@
 {% if orders %}
+{% load convert_filter %}
 <table class="fold-table" id="example">
     <thead>
       <tr>
+        <th>Client Type</th>
         <th>Order ID</th>
         <th>Total Ads in Order</th>
         <th>Client Name</th>
         <th>Marketer Name</th>
-        <th>Total Bill Amount</th>
         <th>Bill Status</th>
+        <th>Total Bill Amount</th>
+        <th>Discount Status</th>
+        <th>Discounted Amount</th>
+        <th>Discount Allowed Admin </th>
+        <th>GST Relaxed? </th>
+        <th>GST Accepted/Rejected Admin? </th>
+        <th>If GST Relaxed? Amount Paid? </th>
+        <th>Agency Discount Percent </th>
+        <th>Final Amount (with 18% GST)</th>
         <th>Order created Date</th>
         <th>Release Order Status</th>
         {% comment %} <th>Action</th> {% endcomment %}
@@ -18,12 +28,88 @@
         {% for order in orders %}
         
         <tr class="view">
+            <td>
+              {% if order.client_id.agency_id != None %}
+                Agency Type
+              {% else %}
+                Direct Client
+              {% endif %}
+            </td>
             <td>{{ order.id }}</td>
             <td>{{ order.advt_set.all|length }}</td>
             <td>{{ order.client_id.name }}</td>
             <td>{{ order.marketer_id.first_name }}</td>
-            <td>{{ order.total_bill_amt }}</td>
             <td>{{ order.order_status }}</td>
+            <td><b>{{ order.total_bill_amt|convert_to_inr }}</b></td>
+            <td>
+              {% if order.discount_decision %}
+              Given 
+              {% else %}
+              Not Given
+              {% endif %}
+              
+            </td>
+            <td>
+              {% if order.discount_decision %}
+                <b>{{ order.discount_alloted_amt|convert_to_inr }}</b>
+              {% else %}
+                -
+              {% endif %}
+            </td>
+            <td>
+              {% if order.discount_decision %}
+                {{ order.discount_allowed_or_rejected_admin }}
+              {% else %}
+                - 
+              {% endif %}
+            </td>
+            <td>
+              {% if order.gst_relax_decision == True%}
+                Yes
+              {% elif order.gst_relax_decision == True %}
+                Rejected
+              {% else %}
+                Not Asked
+              {% endif %}
+            </td>
+            <td>
+              {% if order.gst_relax_decision == True%}
+                {{ order.gst_allowed_or_rejected_admin}}
+              {% elif order.gst_relax_decision == True %}
+              No
+              {% else %}
+              - 
+              {% endif %}
+              
+            </td>
+            <td>
+              {% if order.gst_relax_decision == True%}
+              <b>{{ order.final_bill_amt|convert_to_inr }}</b>
+              {% else %}
+              - 
+              {% endif %}
+            </td>
+            <td>
+              {% if order.client_id.agency_id != None %}
+                {{ order.agency_discount_percent }}% <br>
+                Prev Amt : <b>{{ order.b4_agency_discount_bill }}</b> 
+                 Discount {{ order.agency_discount_amt }}
+               Final Amt : <b>{{ order.final_bill_amt }}</b>
+              {% else %}
+              -
+              {% endif %}
+            </td>
+            <td>
+              {% if order.gst_relax_decision == True%}
+                -
+              {% else %}
+                {% if order.client_id.agency_id != None %}
+                -
+                {% else %}
+                  <b>{{ order.gst_final_bill_amt|convert_to_inr }}</b>
+                {% endif %}
+              {% endif %}
+            </td>
             <td>{{ order.created }}</td>
             <td>
               {% if order.signed_release_order %}
@@ -39,7 +125,7 @@
         </tr>
         {% if order.advt_set.all|length > 0 %}
       <tr class="fold">
-        <td colspan="7">
+        <td colspan="10">
           <div class="fold-content">
             <!-- <h3>Company Name</h3> -->
             <!-- <p>Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas.</p> -->
@@ -48,7 +134,7 @@
               <thead style="font-weight: 600;">
                 <tr>
                   <th>Ad ID</th>
-                  <th>Ad Type</th>
+                  <th>Ad Locations & Types</th>
                   <th>Amount</th>
                   <th>Ad Publishing Date</th>
                   <th>Publishing Status</th>
@@ -59,8 +145,13 @@
                   
                     <tr>
                         <td>{{ advt.id }}</td>
-                        <td>{{ advt.type.title }}</td>
-                        <td>{{ advt.type.rate }}</td>
+
+                        <td>
+                          {% for ad_loc in advt.ad_locs.all %}
+                            {{ ad_loc }} <br>
+                          {% endfor %}
+                          </td>
+                        <td>{{ advt.ad_amt }}</td>
                         <td>{{ advt.ad_pub_date }}</td>
                         <td>
                           {% if advt.is_published %}

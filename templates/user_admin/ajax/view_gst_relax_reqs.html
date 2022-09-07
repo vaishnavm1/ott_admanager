@@ -1,0 +1,121 @@
+{% load convert_filter %}
+{% if orders|length >= 1 %}
+<table class="fold-table" id="example">
+    <thead>
+      <tr>
+        <th>Bill Status</th>
+        <th>Order ID</th>
+        <th>Total Ads in Order</th>
+        <th>Client Name</th>
+        <th>Marketer Name</th>
+        
+        <th>Order created Date</th>
+        <th>Client Signed Release Order Status</th>
+        <th>Discount Status</th>
+        <th>Discount accept/reject admin</th>
+        <th>Discount Amount</th>
+        <th>Total Bill Amount</th>
+        <th>If Discounted new bill amount</th>
+        <th>18% Gst Bill Amount</th>
+        <th>Accept Relax GST request</th>
+        <th>Decline Relax GST request</th>
+      </tr>
+    </thead>
+    <tbody>
+
+      
+        {% for order in orders %}
+        
+        <tr class="view" data-id={{ order.order_id }}  
+          data-final-bill-amt = {{ order.final_bill_amt|convert_to_inr }}
+        >
+
+            <td>{{ order.order_status }}</td>
+
+            <td>{{ order.id }}</td>
+            <td>{{ order.advt_set.all|length }}</td>
+            <td>{{ order.client_id.name }}</td>
+            <td>{{ order.marketer_id }}</td>
+            
+            <td>{{ order.created }}</td>
+            <td>
+              {% if order.signed_release_order %}
+              Done
+              {% else %}
+              Not Uploaded
+              {% endif %}
+            </td>
+            <td>{{ order.discount_decision }}</td>
+            <td>{{ order.discount_allowed_or_rejected_admin }}</td>
+            <td>{{ order.discount_alloted_amt|convert_to_inr }}</td>
+            <td>{{ order.total_bill_amt|convert_to_inr }}</td>
+            <td>
+              {% if order.discount_decision == True %}
+                {{ order.final_bill_amt|convert_to_inr }}
+              {% else %}
+              -
+              {% endif %}
+            </td>
+            <td>{{ order.gst_final_bill_amt|convert_to_inr }}</td>
+            <td>
+                <button class="btn btn-sm btn-success" id="acceptGstRelaxBtn" onclick="acceptGstRelax(this)">Accept GST relax request</button>
+            </td>
+            <td>
+                <button class="btn btn-sm btn-danger" id="rejectGstRelaxBtn" onclick="rejectGstRelax(this)">Reject GST relax request</button>
+            </td>
+        </tr>
+        {% if order.advt_set.all|length > 0 %}
+      <tr class="fold">
+        <td colspan="7">
+          <div class="fold-content">
+            <!-- <h3>Company Name</h3> -->
+            <!-- <p>Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas.</p> -->
+            <p>Total Ads in this order are as follow: </p>
+            <table>
+              <thead style="font-weight: 600;">
+                <tr>
+                  <th>Ad ID</th>
+                  <th>Ad Locations & Types</th>
+                  <th>Amount</th>
+                  <th>Ad Publishing Date</th>
+                  <th>Publishing Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                  {% for advt in order.advt_set.all %}
+                  
+                    <tr>
+                        <td>{{ advt.id }}</td>
+
+                        <td>
+                          {% for ad_loc in advt.ad_locs.all %}
+                            {{ ad_loc }} <br>
+                          {% endfor %}
+                          </td>
+                        <td>{{ advt.ad_amt }}</td>
+                        <td>{{ advt.ad_pub_date }}</td>
+                        <td>
+                          {% if advt.is_published %}
+                            Published on {{ advt.ad_pub_actual_date }}
+                            {% else %}
+                            Not Published
+                          {% endif %}
+                        </td>
+                        <td>
+                          {% comment %} <a href="#">Edit Advt</a> {% endcomment %}
+                        </td>
+                    </tr>
+                {% endfor  %}
+                
+              </tbody>
+            </table>          
+          </div>
+        </td>
+      </tr>
+      {% endif %}
+      {% endfor %}
+    </tbody>
+</table>
+{% else %}
+  <h2>No Gst Requests Found</h2>
+{% endif %}

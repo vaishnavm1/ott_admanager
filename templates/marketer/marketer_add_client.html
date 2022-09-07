@@ -1,3 +1,4 @@
+{% load crispy_forms_tags %}
 {% load static %}
 <!DOCTYPE html>
 <html lang="en">
@@ -6,36 +7,72 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Marketer Add Client</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-gH2yIJqKdNHPEq0n4Mqa/HGKIhSkIHeL5AyhkYV8i59U5AR6csBvApHHNl/vI1Bx" crossorigin="anonymous">
+
     <link rel="stylesheet" href="{% static "assets/css/style.css" %}" />
+    <link rel="stylesheet" href="{% static "css/tagify.css" %}" />
+    <!-- CSS only -->
+
+    <style>
+      .cd-main-header, .cd-side-nav, .cd-side__sub-list {
+        background: #212529;
+      }
+      [aria-current="page"]{
+        {% comment %} color: red!important; {% endcomment %}
+      }
+      .cd-content-wrapper{
+        padding: 0px!important;
+        margin: 10px;
+      }
+
+      .my-btn{
+          background: #0B5ED7;
+          color: white;
+          border: none;
+          padding: 5px;
+          border-radius: 3px;
+          transition-duration: 300ms;
+        }
+        .my-btn:hover{
+            background: #094db3;
+        }
+        .my-btn.success{
+            background: #157347;
+            transition-duration: 300ms;
+            padding: 10px 20px;
+        }
+        .my-btn.success:hover{
+            background: #105837;
+        }
+    </style>
 </head>
 <body>
     <header class="cd-main-header js-cd-main-header">
         <div class="cd-logo-wrapper">
-          <a href="#0" class="cd-logo"><img src="assets/img/cd-logo.svg" alt="OTT Logo"></a>
-          <!-- <a href="#" class="cd-logo">OTT</a> -->
+          <a href="#0" class="cd-logo">
+            <span style="color: white;">OTT Media</span>
+          </a>
         </div>
         
         <div class="cd-reset js-cd-search">
-          <form>
             <!-- <input class="reset" type="search" placeholder="Search..."> -->
-          </form>
         </div>
       
         <button class="reset cd-nav-trigger js-cd-nav-trigger" aria-label="Toggle menu"><span></span></button>
       
         <ul class="cd-nav__list js-cd-nav__list">
-          <li class="cd-nav__item"><a href="#0">Tour</a></li>
-          <li class="cd-nav__item"><a href="#0">Support</a></li>
+          {% comment %} <li class="cd-nav__item"><a href="#0">Tour</a></li>
+          <li class="cd-nav__item"><a href="#0">Support</a></li> {% endcomment %}
           <li class="cd-nav__item cd-nav__item--has-children cd-nav__item--account js-cd-item--has-children">
             <a href="#0">
-              <img src="https://svgshare.com/i/iPh.svg" alt="avatar">
-              <span>Account</span>
+              {% comment %} <img src="https://svgshare.com/i/iPh.svg" alt="avatar"> {% endcomment %}
+              <span>Hi {{ request.user.first_name }}</span>
             </a>
         
             <ul class="cd-nav__sub-list">
-              <li class="cd-nav__sub-item"><a href="#0">My Account</a></li>
-              <li class="cd-nav__sub-item"><a href="#0">Edit Account</a></li>
-              <li class="cd-nav__sub-item"><a href="#0">Logout</a></li>
+              {% comment %} <li class="cd-nav__sub-item"><a href="#0">My Account</a></li> {% endcomment %}
+              {% comment %} <li class="cd-nav__sub-item"><a href="#0">Edit Account</a></li> {% endcomment %}
+              <li class="cd-nav__sub-item"><a href="{% url 'marketer_logout' %}">Logout</a></li>
             </ul>
           </li>
         </ul>
@@ -60,7 +97,8 @@
               
               <ul class="cd-side__sub-list">
                 <li class="cd-side__sub-item"><a aria-current="page" href="#0">Add Client</a></li>
-                <li class="cd-side__sub-item"><a href="#0">Edit Client</a></li>
+                <li class="cd-side__sub-item"><a  href="{% url 'marketer_add_agency' %}">Add Agency</a></li>
+                {% comment %} <li class="cd-side__sub-item"><a href="#0">Edit Client</a></li> {% endcomment %}
               </ul>
             </li>
             
@@ -93,12 +131,86 @@
       
         <div class="cd-content-wrapper">
             <h1>Add Client</h1>
-            <form method="POST">
+              <form method="POST" action="." id="clientForm">
                 {% csrf_token %}
-                {{ form.as_p }}
+
+                {% comment %} {{ form.client_type }} {% endcomment %}
+              <div class="row">
+                <div class="form-group col-md-12">
+                  <label for="id_client_type">Select Client Type</label>
+                  {{ form.client_type }}
+                </div>
+              </div>
+              
+              <div class="row" id="container-agencies" style="display: none;">
+                <div class="form-group col-md-12">
+                  <label for="agencies_tags">Select Agency</label>
+                  <textarea id="agencies_tags"></textarea>
+                  <div id="agencies_tags" class="invalid-feedback">Please select 1 agency</div>
+                </div>
+                <input type="hidden" name="agency" value="Exampe" id="agency_field">
+              </div>
                 
-            <input type="submit" name="submit" value="Submit">
-            </form>
+              <div class="client-container" style="display: none;">
+                  
+                  <div class="row">
+                    <div class="form-group col-md-12">
+                      {{ form.name|as_crispy_field }}
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="form-group col-md-12">
+                      {{ form.company_name|as_crispy_field }}
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="form-group col-md-6">
+                      {{ form.district|as_crispy_field }}
+                    </div>
+                    <div class="form-group col-md-6">
+                      {{ form.taluka|as_crispy_field }}
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="form-group col-md-4">
+                      {{ form.mobile_no.label }}
+                      {{ form.mobile_no }}
+                      <div id="id_mobile_no" class="invalid-feedback">
+                        Client with this Mobile Number already exists
+                      </div>
+                    </div>
+                    <div class="form-group col-md-4">
+                      {{ form.whatsapp_mobile_no.label }}
+                      {{ form.whatsapp_mobile_no }}
+                      <div id="id_whatsapp_mobile_no" class="invalid-feedback">
+                        Client with this WhastApp Number already exists
+                      </div>
+                    </div>
+                    <div class="form-group col-md-4">
+                        {{ form.email.label }}
+                        {{ form.email }}
+                        <div id="id_email" class="invalid-feedback">
+                          Client with this email already exists
+                        </div>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="form-group col-md-12">
+                      {{ form.gst_number.label }}
+                      {{ form.gst_number }}
+                      <div id="id_gst_number" class="invalid-feedback">
+                        Client with this GST Number already exists
+                      </div>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="form-group col-md-12">
+                      {{ form.address|as_crispy_field }}
+                    </div>
+                  </div>
+                  <input type="submit" class="my-btn success mt-4" name="submit" value="Save Client">
+              </div>
+              </form>
             {% if messages %}
               {% for message in messages %}
               
@@ -107,9 +219,273 @@
             {% endif %}
         </div> <!-- .content-wrapper -->
       </main> <!-- .cd-main-content -->
+      
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-A3rJD856KowSb7dwlZdYEkO39Gagi7vIsF0jrRAoQmDKKtQBHUuLZ9AsSv4jD4Xa" crossorigin="anonymous"></script>
+
+    <script src="{% static "js/tagify.min.js" %} "></script>
 
     <script src="{% static "assets/js/util.js" %} "></script>
     <script src="{% static "assets/js/menu-aim.js" %} "></script>
     <script src="{% static "assets/js/main.js" %} "></script>
+
+    <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+
+    <!-- JavaScript Bundle with Popper -->
+    <script defer>
+      
+      
+
+      let mbno = document.getElementById("id_mobile_no");
+      mbno.addEventListener("keypress",(e)=>{
+        if(e.target.value.length >= 10){
+          e.preventDefault();
+        }
+      });
+
+      let ws_mbno = document.getElementById("id_whatsapp_mobile_no");
+      ws_mbno.addEventListener("keypress",(e)=>{
+        if(e.target.value.length >= 10){
+          e.preventDefault();
+        }
+      });
+
+      // document.querySelector("#id_agency_gst_number").classList.add("is-invalid");
+
+      // document.getElementById("id_agency_mobile_no").classList.add("is-invalid");
+      
+      // document.querySelector("#divAgencyType").style.display = "none";
+
+      document.getElementById("id_client_type").selectedIndex = 0;
+      document.getElementById("id_client_type").options[0].disabled = true;
+
+      // var agencyForm = document.getElementById("#agencyForm");
+      // agencyForm.addEventListener("submit", (e)=>{
+      //   e.preventDefault();
+      //   alert("Ok agent");
+      // });
+
+
+      var input_agencies = document.querySelector("#agencies_tags");
+      var tagify_agencies = new Tagify(input_agencies, {
+        whitelist : [],
+        duplicates: false,
+        enforceWhitelist : true,
+        dropdown: {
+            enabled : 0,
+            maxItems: 20
+        },
+        maxTags : 1
+      })
+      var agencies = Array();
+      `{% for agency in agencies %}`
+        agencies.push({value : `{{ agency.agency_name }} `, id : `{{ agency.id }}`});
+      `{% endfor %}`
+      {% comment %} console.log(agencies); {% endcomment %}
+      
+      var agencies_length = `{{ agencies|length }}`;
+      {% comment %} console.log("Dummy") {% endcomment %}
+      tagify_agencies.settings.whitelist.splice(0, agencies_length, ...agencies);
+
+
+
+
+      var form = document.getElementById("clientForm");
+      form.addEventListener("submit", (e)=>{
+        e.preventDefault();
+        let x = document.getElementById("id_client_type");
+        let agency_field = document.getElementById("agency_field");
+
+        if(x.value == "Agency"){
+          if(tagify_agencies.value.length > 0){
+            document.getElementById("agencies_tags").classList.remove('is-invalid');
+            agency_field.value = tagify_agencies.value[0].id;
+          }
+          else{
+            document.getElementById("agencies_tags").classList.add('is-invalid');
+            return;
+          }
+        }
+        else if (x.value == "Direct Client"){
+          agency_field.value = "NA";
+        }
+        
+
+        document.querySelector("#id_email").classList.remove("is-invalid");               
+        document.querySelector("#id_mobile_no").classList.remove("is-invalid"); 
+        document.querySelector("#id_whatsapp_mobile_no").classList.remove("is-invalid");
+        document.querySelector("#id_gst_number").classList.remove("is-invalid");
+
+        let url = `{% url 'add_client' %}`;
+        fetch(url, {
+          method : "POST",
+          body: new FormData(form)
+        })
+        .then(res => {
+          return res.json();
+        })
+        .then(data =>{
+          let result = data['result'];
+          let message = data['message'];
+          if(result){
+            swal({
+              title: "Saved",
+              text: message,
+              icon: "success",
+              button: "OK"
+            })
+            .then( value => {
+              form.reset();
+                    window.location.reload();
+              })
+          }
+          else{
+            
+            if(document.getElementById("id_type").value != "Agency"){
+              if(message == "EMAIL"){
+                document.querySelector("#id_email").classList.add("is-invalid");               
+              }
+              else if(message == "MBNO"){
+                document.querySelector("#id_mobile_no").classList.add("is-invalid"); 
+              }
+              else if(message == "WS_MBNO"){
+                document.querySelector("#id_whatsapp_mobile_no").classList.add("is-invalid");
+              }
+              else if(message == "GST"){
+                document.querySelector("#id_gst_number").classList.add("is-invalid");
+              }
+              else{
+                swal({
+                      title: "Error",
+                      text: "Ohhh",
+                      icon: "error",
+                      button: "OK"
+                });
+              }
+            }
+            else{
+              if(message == "EMAIL"){
+                document.querySelector("#id_agency_email").classList.add("is-invalid");               
+              }
+              else if(message == "MBNO"){
+                document.querySelector("#id_agency_mobile_no").classList.add("is-invalid"); 
+              }
+              else if(message == "WS_MBNO"){
+                document.querySelector("#id_agency_whatsapp_mobile_no").classList.add("is-invalid");
+              }
+              else if(message == "GST"){
+                document.querySelector("#id_agency_gst_number").classList.add("is-invalid");
+              }
+              else{
+                swal({
+                      title: "Error",
+                      text: "Ohhh",
+                      icon: "error",
+                      button: "OK"
+                });
+              }
+
+            }
+
+          }
+        })
+      })
+      function agencyTypeChange(ele){
+        if(ele.value == "New"){
+          // viewFullForm();
+          document.querySelector(".agency-container").style.display = "block";
+        }
+        else if(ele.value == "Old"){
+          document.querySelector(".agency-container").style.display = "none";
+          
+        }
+        
+      }
+      function clientTypeChanged(ele){
+        // document.querySelector(".all-fields").style.display = "block";
+        
+        if(ele.value == "Agency"){
+          
+          document.getElementById("container-agencies").style.display = "block";
+          document.querySelector(".client-container").style.display = "block";
+          // document.querySelector(".client-container").style.display = "none";
+          // document.getElementById("divAgencyType").style.display = "block";
+          // document.getElementById("agencyType").selectedIndex = 0;
+          
+        }
+        else if (ele.value == "Direct Client"){
+          // document.querySelector(".agency-container").style.display = "none";
+          // document.getElementById("divAgencyType").style.display = "none";
+          
+          document.getElementById("container-agencies").style.display = "none";
+          document.querySelector(".client-container").style.display = "block";
+
+
+        }
+
+      }
+      function showClientForm(){
+        // document.getElementById("id_name")
+        // document.getElementById("id_company_name")
+        // document.getElementById("id_district")
+        // document.getElementById("id_taluka")
+        // document.getElementById("id_mobile_no")
+        // document.getElementById("id_whatsapp_mobile_no")
+        // document.getElementById("id_email")
+        // document.getElementById("id_gst_number")
+        // document.getElementById("id_address")
+
+        
+      }
+      
+      function viewAgency(view){
+        if(view){
+          /* Visible agency details */
+          document.getElementById("div_id_agency_name").style.display = "block";
+          document.getElementById("div_id_agency_mobile_no").style.display = "block";
+          document.getElementById("div_id_agency_district").style.display = "block";
+          document.getElementById("div_id_agency_taluka").style.display = "block";
+          document.getElementById("div_id_agency_address").style.display = "block";
+          document.getElementById("div_id_agency_whatsapp_mbno").style.display = "block";
+          document.getElementById("div_id_agency_email").style.display = "block";
+          document.getElementById("div_id_agency_gst").style.display = "block";
+          return;
+        }
+        document.getElementById("div_id_agency_name").style.display = "none";
+        document.getElementById("div_id_agency_mobile_no").style.display = "none";
+        document.getElementById("div_id_agency_district").style.display = "none";
+        document.getElementById("div_id_agency_taluka").style.display = "none";
+        document.getElementById("div_id_agency_address").style.display = "none";
+        document.getElementById("div_id_agency_whatsapp_mbno").style.display = "none";
+        document.getElementById("div_id_agency_email").style.display = "none";
+        document.getElementById("div_id_agency_gst").style.display = "none";
+
+      }
+      function viewFullForm(){
+        document.getElementById("div_id_agency_name").style.display = "block";
+        document.getElementById("id_agency_mobile_no").style.display = "block";
+        document.getElementById("div_id_agency_district").style.display = "block";
+        document.getElementById("div_id_agency_taluka").style.display = "block";
+        document.getElementById("div_id_agency_address").style.display = "block";
+        document.getElementById("id_agency_whatsapp_mbno").style.display = "block";
+        document.getElementById("id_agency_email").style.display = "block";
+        document.getElementById("id_agency_gst_number").style.display = "block";
+      }
+
+
+      function clearFormData(){
+
+        document.getElementById("id_name").value = "";
+        document.getElementById("id_company_name").value = "";
+        document.getElementById("id_district").value = "";
+        document.getElementById("id_taluka").value = "";
+        document.getElementById("id_mobile_no").value = "";
+        document.getElementById("id_whatsapp_mobile_no").value = "";
+        document.getElementById("id_email").value = "";
+        document.getElementById("id_gst_number").value = "";
+        document.getElementById("id_address").value = "";
+      }
+
+      
+    </script>
 </body>
 </html>

@@ -1,0 +1,126 @@
+{% load convert_filter %}
+{% if orders|length >= 1 %}
+<table class="fold-table" id="example">
+    <thead>
+      <tr>
+        <th>Client Name</th>
+        <th>Marketer Name</th>
+        <th>Order ID</th>
+        <th>Order Status</th>
+        <th>Discount requested amount</th>
+
+        <th>Total Ads in Order</th>
+        <th>Total Bill Amount</th>
+        <th>Total Bill with 18% GST</th>
+        <th>GST Relax Status</th>
+        <th>GST Relax Acc/Rej Admin</th>
+        <th>Order created Date</th>
+        <th>Release Order Status</th>
+        <th>Give Discount</th>
+        <th>NOT Give Discount</th>
+      </tr>
+    </thead>
+    <tbody>
+      
+        {% for order in orders %}
+        
+        <tr class="view" data-id={{ order.order_id }} data-dis-req={{ order.discount_req_amt }}
+          data-orignal-bill-amt = {{ order.total_bill_amt }}
+        >
+            <td>{{ order.client_id.name }}</td>
+            <td>{{ order.marketer_id.first_name }}</td>
+            <td>{{ order.id }}</td>
+            <td>{{ order.order_status }}</td>
+            <td><b>{{ order.discount_req_amt|convert_to_inr }}</b></td>
+
+            <td>{{ order.advt_set.all|length }}</td>
+            <td>{{ order.total_bill_amt|convert_to_inr }}</td>
+            <td>{{ order.gst_final_bill_amt|convert_to_inr }}</td>
+            <td>
+              {% if order.gst_relax_decision == True %}
+                Given
+              {% elif order.gst_relax_decision == False %}
+                Rejected
+              {% else %}
+                Not Asked
+              {% endif %}
+            </td>
+            <td>
+              {% if order.gst_relax_decision == True %}
+                {{ order.gst_allowed_or_rejected_admin }}
+              {% elif order.gst_relax_decision == False %}
+                {{ order.gst_allowed_or_rejected_admin }}
+              {% else %}
+                -
+              {% endif %}
+            </td>
+            <td>{{ order.created }}</td>
+            <td>
+              {% if order.signed_release_order %}
+              Done
+              {% else %}
+              Not Uploaded
+              {% endif %}
+            </td>
+            <td>
+                <button class="btn btn-sm btn-success" id="giveDisBtn" onclick="acceptDiscountRequest(this)">Give Discount</button>
+            </td>
+            <td>
+                <button class="btn btn-sm btn-danger" id="rejectDisBtn" onclick="rejectDiscountRequest(this)">Not Give Discount</button>
+            </td>
+        </tr>
+        {% if order.advt_set.all|length > 0 %}
+      <tr class="fold">
+        <td colspan="7">
+          <div class="fold-content">
+            <!-- <h3>Company Name</h3> -->
+            <!-- <p>Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas.</p> -->
+            <p>Total Ads in this order are as follow: </p>
+            <table>
+              <thead style="font-weight: 600;">
+                <tr>
+                  <th>Ad ID</th>
+                  <th>Ad Locations & Types</th>
+                  <th>Amount</th>
+                  <th>Ad Publishing Date</th>
+                  <th>Publishing Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                  {% for advt in order.advt_set.all %}
+                  
+                    <tr>
+                        <td>{{ advt.id }}</td>
+
+                        <td>
+                          {% for ad_loc in advt.ad_locs.all %}
+                            {{ ad_loc }} <br>
+                          {% endfor %}
+                          </td>
+                        <td>{{ advt.ad_amt }}</td>
+                        <td>{{ advt.ad_pub_date }}</td>
+                        <td>
+                          {% if advt.is_published %}
+                            Published on {{ advt.ad_pub_actual_date }}
+                            {% else %}
+                            Not Published
+                          {% endif %}
+                        </td>
+                        <td>
+                          {% comment %} <a href="#">Edit Advt</a> {% endcomment %}
+                        </td>
+                    </tr>
+                {% endfor  %}
+                
+              </tbody>
+            </table>          
+          </div>
+        </td>
+      </tr>
+      {% endif %}
+      {% endfor %}
+    </tbody>
+</table>
+{% else %}
+  <h2>No Discount Requests Found</h2>
+{% endif %}

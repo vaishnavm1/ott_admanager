@@ -121,7 +121,9 @@
       .fold-content > table > tbody tr:nth-child(even) {
         background: #eee;
       }
-
+      .cd-main-header, .cd-side-nav, .cd-side__sub-list {
+        background: #212529;
+      }
 
 
     </style>
@@ -180,7 +182,7 @@
               
               <ul class="cd-side__sub-list">
                 <li class="cd-side__sub-item"><a href="{% url 'accountant_create_marketer' %}">Add Marketer</a></li>
-                {% comment %} <li class="cd-side__sub-item"><a href="#0">Edit Marketer</a></li> {% endcomment %}
+                <li class="cd-side__sub-item"><a href="{% url 'accountant_edit_marketers' %}">Edit Marketer</a></li>
               </ul>
             </li>
 
@@ -224,13 +226,13 @@
       
         <div class="cd-content">
             <div class="row">
-              <div class="form-group col-md-4">
+              {% comment %} <div class="form-group col-md-4">
                 <label for="doctor_tags">Select Date & Time</label>
                 <div id="reportrange" style="background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc; width: 100%">
                   <i class="fa fa-calendar"></i>&nbsp;
                   <span></span> <i class="fa fa-caret-down"></i>
                 </div>
-              </div>
+              </div> {% endcomment %}
                 <div class="form-group col-md-5">
                   <label for="marketer_tags">By Marketer</label>
                   <textarea id="marketer_tags"></textarea>
@@ -246,7 +248,7 @@
             
             <div class="ad-container" style="margin: 10px; height: 450px; overflow: auto;">
 
-              {% include "accountant/table1.html" %}
+              {% comment %} {% include "accountant/table1.html" %} {% endcomment %}
               
             </div>
             <div class="" id="spinner-container" style="height: 100%; display: none; justify-content: center; align-items: center; position: absolute; top: 0; right: 50%;">
@@ -292,7 +294,7 @@
         });
       });
       // Date Time Picker Init code...
-      $(function() {
+      {% comment %} $(function() {
         var start = moment().startOf("day");
         var end = moment().endOf("day");
 
@@ -326,7 +328,7 @@
 
         cb(start, end);
 
-      });
+      }); {% endcomment %}
 
       {% comment %} Manage Marketers Tagify {% endcomment %}
       var input_marketers = document.querySelector("#marketer_tags");

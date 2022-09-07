@@ -1,4 +1,4 @@
-from distutils.command.upload import upload
+# from distutils.command.upload import upload
 from django.db import models
 import os
 from django.core.exceptions import ValidationError
@@ -108,6 +108,8 @@ class Account(AbstractBaseUser, PermissionsMixin):
 # Just created for the sake of it, allocate charts, search and filter functionalities
 class Admin(Account):
     pass
+    def __str__(self):
+        return f'{self.first_name} {self.middle_name} {self.last_name}'
 
 class Marketer(Account):
     pass
@@ -124,17 +126,51 @@ class Accountant(Account):
 
 
 # Now custom models other than auth models will be defined...
+class Agency(models.Model):
+    agency_name                 =   models.CharField(max_length=252, blank=True, null=True)
+    agency_mobile_no            =   models.CharField(max_length=30,  unique=True)
+    agency_district             =   models.CharField(max_length=252, blank=True, null=True)
+    agency_taluka               =   models.CharField(max_length=252, blank=True, null=True)
+    agency_address              =   models.TextField(blank=True, null=True)
+    agency_whatsapp_mobile_no   =   models.CharField(max_length=30, unique=True)
+    agency_email                =   models.EmailField(max_length=60, unique=True)
+    agency_gst_number           =   models.CharField(max_length=100, blank=True, null=True)
+
+    marketer_id                 =   models.ForeignKey(Marketer, on_delete=models.CASCADE, null=True, blank=True)
+    def __str__(self):
+        return self.agency_name
+    
+
 
 class Client(models.Model):
-    name        =   models.CharField(max_length=252)
-    district    =   models.CharField(max_length=252)
-    taluka      =   models.CharField(max_length=252)
-    address     =   models.TextField()
-    mbno        =   models.CharField(max_length=30, unique = True)
-    email       =   models.EmailField(max_length=60, unique = True)
-    date_joined =   models.DateTimeField(verbose_name="date_joined", auto_now_add=True)
-    is_active   =   models.BooleanField(default = True)
-    marketer_id =   models.ForeignKey(Marketer, on_delete=models.CASCADE, null=True, blank=True)
+
+    # class Type(models.TextChoices):
+    #     AGENCY = "Agency" 
+    #     DIRECT_CLIENT = "Direct Client"
+
+    # is_agency               =   models.BooleanField(default=False)
+    agency_id               =   models.ForeignKey(Agency, on_delete=models.CASCADE, null=True, blank=True)
+    # client_type             =   models.CharField(max_length=252, default=Type.DIRECT_CLIENT)
+
+
+    
+    
+    company_name         =   models.CharField(max_length=252)
+
+    name                 =   models.CharField(max_length=252)
+    district             =   models.CharField(max_length=252)
+    taluka               =   models.CharField(max_length=252)
+    address              =   models.TextField()
+    mobile_no            =   models.CharField(max_length=30, unique = True)
+
+    whatsapp_mobile_no   =   models.CharField(max_length=30, unique = True)
+    gst_number           =   models.CharField(max_length=100, null=True, blank=True)
+
+    email                =   models.EmailField(max_length=60, unique = True)
+
+    created     =   models.DateTimeField(verbose_name="date_joined", auto_now_add=True)
+    is_active       =   models.BooleanField(default = True)
+    marketer_id     =   models.ForeignKey(Marketer, on_delete=models.CASCADE, null=True, blank=True)
 
     def __str__(self):
         return self.name
@@ -154,53 +190,140 @@ class Order(models.Model):
         UPI = "Upi"
         CHEQUE = "Cheque"
         NET_BANKING = "Net-Banking"
+        Pdc_Cheque  = "Pdc_Cheque"
         NONE = "None"
 
     # ORDER_STATUS_CHOICES            =   (("In Review","In Review"), ("Fresh", "Fresh"), ("Accepted", "Accepted"), ("Rejected", "Rejected") )
     # ORDER_MOP_CHOICES               =   (("cash", "Cash"), ("upi", "UPI"), ("cheque", "Cheque"), ("none", "None")) 
 
-    order_id                =   models.UUIDField(default=uuid.uuid4, editable=False)
-    
-    client_id               =   models.ForeignKey(Client, on_delete = models.CASCADE)
-    marketer_id             =   models.ForeignKey(Marketer, on_delete = models.CASCADE)
+    order_id                            =   models.UUIDField(default=uuid.uuid4, editable=False)
+    client_id                           =   models.ForeignKey(Client, on_delete = models.CASCADE)
+    marketer_id                         =   models.ForeignKey(Marketer, on_delete = models.CASCADE)
 
-    bill_status             =   models.BooleanField(default = False)
-    order_status            =   models.CharField(max_length=100, choices=Status.choices, default = Status.FRESH)
+    bill_status                         =   models.BooleanField(default = False)
+
+    bill_status_msg                     =   models.CharField(max_length=200, null=True, blank=True)
     
-    total_bill_amt          =   models.IntegerField(default = 0)
+    order_status                        =   models.CharField(max_length=100, choices=Status.choices, default = Status.FRESH)
+
+    discount_requested                  =   models.BooleanField(default=False)
+    discount_req_amt                    =   models.IntegerField(default=0)
+    
+    discount_decision                   =   models.BooleanField(null=True, blank=True)
+    discount_alloted_amt                =   models.IntegerField(default=0)
+
+    # Will be null in all cases, expect when someone i.e admin allows discount
+
+    discount_allowed_or_rejected_admin  =   models.ForeignKey(Admin, null=True, blank=True, on_delete = models.CASCADE)
+
+    discounted_new_bill_amt             =   models.IntegerField(null=True, blank=True)
+
+    # GST Section
+    gst_relax_requested                 =   models.BooleanField(default=False)
+    gst_relax_decision                  =   models.BooleanField(null=True, blank=True)
+    gst_allowed_or_rejected_admin       =   models.ForeignKey(Admin, null=True, blank=True, on_delete = models.CASCADE, related_name="gst_allowed_or_rejected_admin")
+
+
+    
+    total_bill_amt                      =   models.IntegerField(default = 0)
+
+    # After discount or not.... Final Bill Paid by the client
+    
+    final_bill_amt          =   models.IntegerField(default = 0)
+    gst_final_bill_amt      =   models.IntegerField(default = 0)
+
+    # Agency discout, only if client has come via an agency
+    agency_discount_percent =   models.IntegerField(default=0, null=True, blank=True)
+    agency_discount_amt     =   models.IntegerField(default=0, null=True, blank=True)
+    agency_discount_given   =   models.BooleanField(default=False)
+
+    b4_agency_discount_bill =   models.IntegerField(default=0, null=True, blank=True)
+
     mode_of_pay             =   models.CharField(max_length=100, choices=Mop.choices, default = Mop.NONE)
     trans_id                =   models.CharField(max_length=100, null = True, blank = True)
-    cheque_image            =   models.ImageField(upload_to="cheque-images", null=True, blank=True)
-    bill_receipt            =   models.ImageField(upload_to="bill-receipts", null=True, blank=True)
-    release_order           =   models.ImageField(upload_to="release-orders", null=True, blank=True)
-    signed_release_order    =   models.ImageField(upload_to="signed-release-orders", null=True, blank=True)
+    payment_accepted_datetime=  models.DateTimeField(null=True, blank=True)
+    # cheque_image            =   models.ImageField(upload_to="cheque-images", null=True, blank=True)
+    # bill_receipt            =   models.ImageField(upload_to="bill-receipts", null=True, blank=True)
+    # release_order           =   models.ImageField(upload_to="release-orders", null=True, blank=True)
+    signed_release_order    =   models.FileField(upload_to="signed-release-orders", null=True, blank=True)
     created                 =   models.DateTimeField(verbose_name="created", auto_now_add=True)
 
-
-
-
-
-class AdType(models.Model):
-    title       =   models.CharField(max_length=100)
-    rate        =   models.IntegerField()
-    is_active   =   models.BooleanField(default = True, blank = True, null = True)
-    created =   models.DateTimeField(auto_now_add=True)
-    def __str__(self):
-        return f'{self.title} | {self.rate}'
+    def get_discounted_new_bill(self):
+        return self.total_bill_amt - self.discount_alloted_amt
+    
+    
 
 
 
 class Advt(models.Model):
     desc                    =   models.TextField(verbose_name="Ad Description")
     ad_image                =   models.ImageField(upload_to="ad-images", null = True, blank = True)
-    type                    =   models.ForeignKey(AdType, on_delete=models.CASCADE)
+    # type                    =   models.ForeignKey(AdType, on_delete=models.CASCADE)
 
     order_id                =   models.ForeignKey(Order, on_delete=models.CASCADE)
+    ad_amt                  =   models.IntegerField(default=0)
     
-    ad_pub_date             =   models.DateTimeField()
+    ad_pub_date             =   models.DateTimeField(unique = True, blank=True, null=True)
     ad_pub_actual_date      =   models.DateTimeField(null = True, blank = True)
     is_published            =   models.BooleanField(default = False)
 
+
+class Type(models.Model):
+    title       =   models.CharField(max_length=100)
+    created =   models.DateTimeField(auto_now_add=True)
+    is_active   =   models.BooleanField(default = True)
+    def __str__(self):
+        return f'{self.title}'
+
+
+class Location(models.Model):
+    name    =   models.CharField(max_length=100)
+    rate    =   models.IntegerField()
+    type    =   models.ForeignKey(Type, on_delete=models.CASCADE)
+    # Is Location Full Maharashtra
+    is_mah  =   models.BooleanField(default=False)
+
+    is_active   =   models.BooleanField(default = True)
+    def __str__(self):
+        return f'{self.name} | {self.type} INR : {self.rate}'
+    
+
+class AdLoc(models.Model):
+    location    =   models.ForeignKey(Location, on_delete=models.CASCADE)
+    advt_id     =   models.ForeignKey(Advt, on_delete=models.CASCADE, related_name="ad_locs")
+    def __str__(self):
+        return f'{self.location} | Ad : {self.advt_id.id}'
+    
+
+    
+
+
+
+
+
+
+#  Iteration 2 Reason : By client (tables modeified : Advt, AdType)
+# class AdType(models.Model):
+#     title       =   models.CharField(max_length=100)
+#     rate        =   models.IntegerField()
+#     is_active   =   models.BooleanField(default = True, blank = True, null = True)
+#     created =   models.DateTimeField(auto_now_add=True)
+#     def __str__(self):
+#         return f'{self.title} | {self.rate}'
+
+
+# class Advt(models.Model):
+#     desc                    =   models.TextField(verbose_name="Ad Description")
+#     ad_image                =   models.ImageField(upload_to="ad-images", null = True, blank = True)
+#     type                    =   models.ForeignKey(AdType, on_delete=models.CASCADE)
+
+#     order_id                =   models.ForeignKey(Order, on_delete=models.CASCADE)
+    
+#     ad_pub_date             =   models.DateTimeField()
+#     ad_pub_actual_date      =   models.DateTimeField(null = True, blank = True)
+#     is_published            =   models.BooleanField(default = False)
+
+#  Iteration 1 Reason : By me
 # class Advt(models.Model):
 #     desc                    =   models.TextField()
 #     ad_image                =   models.ImageField(upload_to="ad-images", null = True, blank = True)

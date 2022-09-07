@@ -1,0 +1,133 @@
+
+
+
+    START IF stat 'Asked for Discout'
+    {% if order_obj.discount_requested %}
+
+    {% if order_obj.discount_decision == None  %}
+    <h3>
+      You have request a discount of Rs :<b> {{ order_obj.discount_req_amt }} </b><br>
+      Please wait for 24-36 hours...
+    </h3>
+    
+    {% endif %}
+    {% comment %} If Discount is Rejected... {% endcomment %}
+    {% if order_obj.discount_decision == False %}
+      
+      {% if order_obj.order_status != Order.Status.FRESH %}
+
+      <div class="row">
+        <div class="form-group col-md-6">
+          <label for="modeOfPayment">{{ orderviewform.mode_of_pay.label }}</label>
+          {{ orderviewform.mode_of_pay }}
+        </div>
+        <div class="form-group col-md-6">
+          <label for="transaction_id">{{ orderviewform.trans_id.label }}</label>
+          {{ orderviewform.trans_id }}
+        </div>
+
+      </div>  
+      {% endif %}
+      {% if order_obj.order_status == Order.Status.FRESH %}
+        <h3>Your discount request has been rejected and client has to pay full amount</h3>
+
+        {% include "marketer/snips/show_mop_container.html" %}
+
+      {% endif %}
+
+      
+    {% endif %}
+    {% comment %} If Discount is accepted then show new amount & MOP containers {% endcomment %}
+
+
+    {% else %}
+    
+      {% if order_obj.order_status == order_obj.Status.FRESH %}
+        <p>Do you want to give this client discount?</p>
+        <button class="btn btn-primary" id="confirmYesDiscountBtn">Yes</button>
+        <div class="row discount-allow-container" style="display: none;">
+          <div class="form-group col-md-6">
+            <label for="discounted_amt">Enter discount you want to give</label>
+            <input type="number" class="form-control" name="discounted_amt" id="discounted_amt" value="0" onkeyup="keyDownDiscountAmt(event)" />
+            <div id="discounted_amt" class="invalid-feedback">
+              Discount Amount should be less than Orignal Amount
+            </div>
+          </div>
+          <div class="form-group col-md-5">
+            <label for="finalAmt">Final Amount will be</label>
+            <h4 id="finalAmt">{{ order_obj.total_bill_amt }}</h4>
+          </div>
+          <div class="form-group col-md-1">
+            <button class="btn btn-danger btn-sm" id="cancelDiscountBtn">Cancel Discount</button>
+          </div>
+          <div class="row">
+            <div class="form-group col-md-4 mt-4">
+              <button class="btn btn-primary btn-sm" onclick="submitDiscountRequest()">Submit a Discount Request</button>
+            </div>
+            <div class="form-group col-md-4 mt-4">
+              (Discount request may be Accepted or Rejected in a timeline of 24-36 hours)
+            </div>
+          </div>
+        </div>
+        {% else %}
+        {% endif %}
+
+
+    
+
+    <div class="payment-container">
+
+      {% if orderviewform %}
+        <div class="row">
+          <div class="form-group col-md-6">
+            <label for="modeOfPayment">{{ orderviewform.mode_of_pay.label }}</label>
+            {{ orderviewform.mode_of_pay }}
+          </div>
+          <div class="form-group col-md-6">
+            <label for="transaction_id">{{ orderviewform.trans_id.label }}</label>
+            {{ orderviewform.trans_id }}
+          </div>
+
+        </div>  
+      
+      
+
+      
+        {% else %}
+            <div class="row">
+              <div class="form-group col-md-6">
+                <label for="modeOfPayment">Select Mode Of Payment</label>
+                <select class="form-select" aria-label="Default select example" onchange="changeMopEvent(this)" id="modeOfPayment">
+                  <option disabled="" selected="" value="0"> -- Select -- </option>
+                    <option value="Cash">Cash</option>
+                    <option value="Upi">UPI</option>
+                    <option value="Cheque">Cheque</option>
+                    <option value="Net-Banking">Net Banking</option>
+                  </select>
+                  <div id="modeOfPayment" class="invalid-feedback">
+                    Please Select a Mode of Payment
+                  </div>
+                </div>
+                <div class="form-group col-md-6" id="trans_id_box" style="display: none;">
+                  <label for="transaction_id">Transaction ID</label>
+                  <input type="text" class="form-control" id="transaction_id" placeholder="Enter Transaction ID" required="">
+                  <div id="transaction_id" class="invalid-feedback">
+                    Please enter the Transaction ID
+                  </div>
+                </div>
+              </div>
+          {% endif %}
+
+
+        <br>
+        {% if orderviewform %}
+        <h3>To Edit Ad goto <b>Edit Ad</b> in previous menu</h3>
+        {% else %}
+        <button class="btn btn-lg btn-success" id="submitAdBtn">Submit Payment </button> <br><br>
+        {% endif %}
+
+      {% endif %}
+    {% comment %} END IF stat 'Asked for Discout' {% endcomment %}
+      
+    </div>
+    {% comment %}{% endcomment %}

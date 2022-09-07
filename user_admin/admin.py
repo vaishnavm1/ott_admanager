@@ -5,6 +5,9 @@ from django.contrib.auth.admin import UserAdmin
 from .models import *
 from django.contrib.auth.forms import ReadOnlyPasswordHashField
 
+
+from import_export.admin import ImportExportModelAdmin
+
 class UserCreationForm(forms.ModelForm):
     """A form for creating new users. Includes all the required
     fields, plus a repeated password."""
@@ -87,7 +90,7 @@ class L2AdminAccount(UserAdmin):
             )
 
 class MarketerAccount(UserAdmin):
-    list_display = ("date_joined","last_login","is_admin","is_staff", "mobile_no", "email", "first_name", "middle_name", "last_name", "district", "taluka", "address")
+    list_display = ("date_joined","last_login","is_active",  "mobile_no", "email", "first_name", "middle_name", "last_name", "district", "taluka", "is_admin","is_staff",)
     search_fields = ("email", "mobile_no")
     readonly_fields = ("date_joined","last_login")
     filter_horizontal = ()
@@ -138,7 +141,7 @@ class AccountantAccount(UserAdmin):
 
 
 admin.site.register(Account, AccountAdmin)
-admin.site.register(Post)
+# admin.site.register(Post)
 admin.site.register(Admin, L2AdminAccount)
 
 admin.site.register(Marketer, MarketerAccount)
@@ -150,11 +153,29 @@ class OrderAdmin(admin.ModelAdmin):
     list_filter = ("client_id", )
 
 class AdvtAdmin(admin.ModelAdmin):
-    list_display = ["id", "is_published", "order_id"]
+    list_display = ["id", "is_published", "order_id", "ad_amt", "ad_pub_date",]
     list_filter = ("is_published", )
+
+class LocationAdmin(ImportExportModelAdmin, admin.ModelAdmin):
+    list_display = ["id", "name", "rate", "type", "is_mah", "is_active"]
+
+class TypeAdmin(ImportExportModelAdmin, admin.ModelAdmin):
+    list_display = ["title", "is_active"]
+
+class ClientAdmin(admin.ModelAdmin):
+    list_display = ["name", "email"]
 
 
 admin.site.register(Order, OrderAdmin)
-admin.site.register(Client)
+admin.site.register(Client, ClientAdmin)
 admin.site.register(Advt, AdvtAdmin)
-admin.site.register(AdType)
+admin.site.register(Type, TypeAdmin)
+admin.site.register(Location, LocationAdmin)
+
+admin.site.register(AdLoc)
+admin.site.register(Agency)
+
+
+
+
+# admin.site.register(AdType)

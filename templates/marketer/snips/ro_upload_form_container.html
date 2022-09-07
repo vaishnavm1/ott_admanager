@@ -1,0 +1,46 @@
+{% if showForm == True %}
+
+<div class="reupload-ro-container" style="">
+  <form method="post" id="myForm" enctype="multipart/form-data">
+      <div class="row mt-3">
+        {% csrf_token %}
+          <!-- <div class="form-group col-md-12"> -->
+            <!-- <label for="signed_release_order">Upload the image of Release Order (RO) signed & stamped by client</label>
+            <input type="file" class="form-control" name="signed_release_order" id="signed_release_order" required> -->
+            {{ ro_upload_form.as_p }}
+          <!-- </div> -->
+      </div>
+      
+      <div class="row mt-3">
+          <div class="form-group col-md-12">
+              <input type="submit" class="btn btn-primary" value="Submit RO">
+          </div>
+      </div>
+    </form>
+</div>
+{% else %}
+<br>
+{% if viewImage == True %}
+  <a href="#" id="myImg" data-src='{{ order.signed_release_order.url }}' showForm=False>View uploaded RO</a>
+{% else %}
+{% endif %}
+<button class="btn btn-outline-warning btn-sm mt-3" id="reupload-ro-btn">Reupload RO</button>
+<div class="reupload-ro-container" style="display: none;">
+  <form method="post" id="myForm" enctype="multipart/form-data">
+      <div class="row mt-3">
+        {% csrf_token %}
+          <!-- <div class="form-group col-md-12"> -->
+            <!-- <label for="signed_release_order">Upload the image of Release Order (RO) signed & stamped by client</label>
+            <input type="file" class="form-control" name="signed_release_order" id="signed_release_order" required> -->
+            {{ ro_upload_form.as_p }}
+          <!-- </div> -->
+      </div>
+      
+      <div class="row mt-3">
+          <div class="form-group col-md-12">
+              <input type="submit" class="btn btn-primary" value="Submit RO">
+          </div>
+      </div>
+    </form>
+</div>
+{% endif %}

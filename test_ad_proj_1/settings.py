@@ -30,7 +30,7 @@ SECRET_KEY = 'django-insecure-c#mpd5e=ks(7dpik9q^5alko+o*1kit@z5px-j3a-2h6^gu&u4
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ["*"]
 
 
 # Application definition
@@ -62,6 +62,8 @@ INSTALLED_APPS = [
 
     "django_hosts",
     "crispy_forms",
+
+    'import_export',
 ]
 
 MIDDLEWARE = [
@@ -232,3 +234,32 @@ AWS_QUERYSTRING_EXPIRE = 100
 AWS_S3_REGION_NAME = "ap-south-1"
 
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
+
+
+def patch_broken_pipe_error():
+    """Monkey Patch BaseServer.handle_error to not write
+    a stacktrace to stderr on broken pipe.
+    http://stackoverflow.com/a/22618740/362702"""
+    import sys
+    from socketserver import BaseServer
+    from wsgiref import handlers
+
+    handle_error = BaseServer.handle_error
+    log_exception = handlers.BaseHandler.log_exception
+
+    def is_broken_pipe_error():
+        type, err, tb = sys.exc_info()
+        return repr(err) == "error(32, 'Broken pipe')"
+
+    def my_handle_error(self, request, client_address):
+        if not is_broken_pipe_error():
+            handle_error(self, request, client_address)
+
+    def my_log_exception(self, exc_info):
+        if not is_broken_pipe_error():
+            log_exception(self, exc_info)
+
+    BaseServer = my_handle_error
+    handlers.BaseHandler.log_exception = my_log_exception
+
+patch_broken_pipe_error()

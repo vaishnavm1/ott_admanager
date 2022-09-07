@@ -6,20 +6,38 @@
         <th>Client Name</th>
         <th>Marketer Name</th>
         <th>Total Bill Amount</th>
+        <th>Discount Given</th>
+        <th>GST Relax Given?</th>
+        {% comment %} <th>Amount Paid + 18% GST</th> {% endcomment %}
         <th>Bill Status</th>
         <th>Ad created Date</th>
         <th>Action</th>
       </tr>
     </thead>
     <tbody>
-      
+      {% load convert_filter %}
         {% for order in orders %}
         
         <tr class="view">
             <td>{{ order.advt_set.all|length }}</td>
             <td>{{ order.client_id.name }}</td>
             <td>{{ order.marketer_id.first_name }}</td>
-            <td>{{ order.total_bill_amt }}</td>
+            <td>{{ order.total_bill_amt|convert_to_inr }}</td>
+            <td>
+              {% if order.discount_requested %}
+              {{ order.discount_alloted_amt|convert_to_inr }}
+              {% else %}
+              No
+              {% endif %}
+            </td>
+            <td>
+              {% if order.gst_relax_decision == True %}
+                Yes
+              {% else %}
+                No
+              {% endif %}
+            </td>
+            {% comment %} <td>{{ order.gst_final_bill_amt|convert_to_inr }}</td> {% endcomment %}
             <td>{{ order.order_status }}</td>
             <td>{{ order.created }}</td>
             <td>
@@ -45,8 +63,12 @@
                   {% for advt in order.advt_set.all %}
                   
                     <tr>
-                        <td>{{ advt.type.title }}</td>
-                        <td>{{ advt.type.rate }}</td>
+                        <td>
+                          {% for ad_loc in advt.ad_locs.all %}
+                            {{ ad_loc }} <br>
+                          {% endfor %}
+                        </td>
+                        <td>{{ advt.ad_amt }}</td>
                         <td>{{ advt.ad_pub_date }}</td>
                     </tr>
                 {% endfor  %}

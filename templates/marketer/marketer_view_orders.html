@@ -6,7 +6,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Marketer Home</title>
+    <title>Executive | View Orders</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-0evHe/X+R7YkIZDRvuzKMRqM+OrBnVFBL6DOitfPri4tjfHxaWutUpFmBp4vmVor" crossorigin="anonymous">
     <link rel="stylesheet" href="{% static "assets/css/style.css" %}" />
     <link rel="stylesheet" href="{% static "css/tagify.css" %}" />
@@ -50,6 +50,10 @@
         }
         #spinner-container .spinner-border{
             display: none;
+        }
+        .fold-table thead{
+          background: black;
+          color: white;
         }
 
 
@@ -135,14 +139,25 @@
         background: #eee;
       }
 
+      .cd-main-header, .cd-side-nav, .cd-side__sub-list {
+        background: #212529;
+      }
+
+      @media (max-width: 600px){
+        .cd-content-wrapper{
+          margin-top: -3vh!important;
+        }
+      }
+
 
     </style>
 </head>
 <body>
     <header class="cd-main-header js-cd-main-header">
         <div class="cd-logo-wrapper">
-          <a href="#0" class="cd-logo"><img src="assets/img/cd-logo.svg" alt="OTT Logo"></a>
-          <!-- <a href="#" class="cd-logo">OTT</a> -->
+          <a href="#0" class="cd-logo">
+            <span style="color: white;">OTT Media</span>
+          </a>
         </div>
         
         <div class="cd-reset js-cd-search">
@@ -163,8 +178,8 @@
             </a>
         
             <ul class="cd-nav__sub-list">
-              <li class="cd-nav__sub-item"><a href="#0">My Account</a></li>
-              <li class="cd-nav__sub-item"><a href="#0">Edit Account</a></li>
+              {% comment %} <li class="cd-nav__sub-item"><a href="#0">My Account</a></li>
+              <li class="cd-nav__sub-item"><a href="#0">Edit Account</a></li> {% endcomment %}
               <li class="cd-nav__sub-item"><a href="{% url 'marketer_logout' %}">Logout</a></li>
             </ul>
           </li>
@@ -189,8 +204,8 @@
               <a href="#0">My Clients</a>
               
               <ul class="cd-side__sub-list">
-                <li class="cd-side__sub-item"><a href="#0">Add Client</a></li>
-                <li class="cd-side__sub-item"><a href="#0">Edit Client</a></li>
+                <li class="cd-side__sub-item"><a href="{% url 'marketer_add_client' %}">Add Client</a></li>
+                {% comment %} <li class="cd-side__sub-item"><a href="#0">Edit Client</a></li> {% endcomment %}
               </ul>
             </li>
             
@@ -207,8 +222,10 @@
               <a href="#">Manage My Ads</a>
               
               <ul class="cd-side__sub-list">
-                <li class="cd-side__sub-item"><a href="#0">Add Ad</a></li>
-                <li class="cd-side__sub-item"><a aria-current="page" href="#0">Update Ad <span class="cd-count">{{ unsigned_orders }}</span></a></li>
+                <li class="cd-side__sub-item"><a href="{% url 'marketer_add_ad' %}">Add Ad</a></li>
+                <li class="cd-side__sub-item">
+                  <a aria-current="page" href="#0">View/Edit Ad 
+                    <span class="cd-count">{{ unsigned_orders }}</span></a></li>
                 
               </ul>
             </li>
@@ -216,7 +233,7 @@
           
         </nav>
         <div class="cd-content-wrapper" style="margin-top:-9vh;">
-            <h1>Edit Orders  & RO</h1><h4>(You can only edit un-published ads)</h4>
+            <h1>Edit Orders  & View RO's</h1><h4>(You can only edit un-published ads)</h4>
             <div class="row mt-2">
                 <div class="form-group col-md-8">
                     <label for="clients_tags">By Clients</label>
@@ -352,14 +369,19 @@
             },
             maxTags : 1
         });
-
+        
 
         var clients = Array();
-      `{% for clients in clients %}`
-        clients.push({value : `{{ clients.name }}`, id : `{{ clients.id }}`});
+      `{% for client in clients %}`
+        {% if client.agency_id != None %}
+            clients.push({value : `Agency : {{ client.agency_id.agency_name }} ֍ {{ client.name }}`, id : `{{ client.id }}`});
+        {% else %}
+            clients.push({value : `{{ client.name }}`, id : `{{ client.id }}`});
+        {% endif %}
       `{% endfor %}`
       var clients_length = `{{ clients|length }}`;
       tagify_clients.settings.whitelist.splice(0, clients_length, ...clients);
+
 
 
       // If an client is added

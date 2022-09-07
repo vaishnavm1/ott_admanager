@@ -1,64 +1,237 @@
-<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title></title>
+    <title>Document</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@300&display=swap');
+        {% comment %} @import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@300&family=Roboto:wght@300&display=swap'); {% endcomment %}
+
+        @import url('https://fonts.googleapis.com/css2?family=Roboto&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@300&family=Roboto:wght@300;900&display=swap');
         *{
             /* font-family: "Times New Roman", Times, serif; */
             font-family: 'Open Sans', sans-serif;
+            font-family: 'Roboto', sans-serif;
+            font-weight: 400;
             /* letter-spacing: 2px; */
 
         }
-        .container{
-            width: 800px;
-            margin: 0 auto;
+        body .container{
+          padding-left: 5%;
+          padding-right: 5%;
         }
+        header{
+          /* display: flex; */
+          margin: 10px 0;
+          display: -webkit-box;
+          width: 100%;
+        } 
+        header .head-content-container{
+          background-color: #006ea8;
+          width: 100%;
+          padding-left: 20px;
+          margin-left: 20px;
+        }
+        header .head-content-container .head-brand-name{
+          font-size: 1.8rem;
+          color: white;
+          
+        }
+        header .head-content-container .head-address{
+          color: white;
+          margin-top: 10px;          
+        }
+        
+        header .head-content-container .head-contact{
+          color: white;
+          margin-top: 10px;          
+          padding-bottom: 10px;          
+        }
+        
+        .container{
+          width: 800px;
+          margin: 0 auto;
+          margin-top: 50px;
+          position: relative;
+          font-size: 1.2rem;
+          font-weight: 800;
+
+        }
+        
+        .container #title{
+          font-size: 1.3rem;
+          text-decoration: underline;
+          font-weight: bold;
+          letter-spacing: 1px;
+        }
+
+        .container #ad-date{
+          position: absolute;
+          top: 0;
+          right: 10%;
+        }
+        .sign-container{
+          margin-top: 150px;
+          display: -webkit-box;
+          
+        }
+        .sign-container p:nth-child(2){
+          margin-left: 30%;
+        }
+        .sign-container p:nth-child(3){
+          margin-left: 20%;
+          margin-right: 5%;
+          
+        }
+        #companyName{
+          font-family: 'Roboto', sans-serif;
+          font-weight: 900;
+        }
+        
+
 
         
         </style>
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-0evHe/X+R7YkIZDRvuzKMRqM+OrBnVFBL6DOitfPri4tjfHxaWutUpFmBp4vmVor" crossorigin="anonymous">
 </head>
 <body>
-    <div class="container">
-        <center><h1><i>OnThisTime Media Pvt Ltd</i></h1></center>
-        <center><h3>Release Order (RO)</h3></center>
+    <div class='my-header'>
+      <img src="https://join.onthistime.news/static/images/ott-full-strip.png" width="100%" alt="OTT Logo & Address" />
+    </div>
+    {% comment %} <header>
+        <div class="img-container">
+          <img src="https://i.ibb.co/jrfJVQL/POST-23-02-2022-png.png" alt="OTT Logo" width="160" height="70">
+        </div>
+        <div class="head-content-container">
+          <span class="head-brand-name">On This Time Media Pvt Ltd.</span>
+          <div class="head-address">
+            <span>   <svg width="11px" height="18px" viewBox="0 0 14 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+              <title>pin_fill_sharp_circle [#634]</title>
+              <desc>Created with Sketch.</desc>
+              <defs></defs>
+              <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                  <g id="Dribbble-Light-Preview" transform="translate(-223.000000, -5399.000000)" fill="#ffffff">
+                      <g id="icons" transform="translate(56.000000, 160.000000)">
+                          <path d="M174,5248.219 C172.895,5248.219 172,5247.324 172,5246.219 C172,5245.114 172.895,5244.219 174,5244.219 C175.105,5244.219 176,5245.114 176,5246.219 C176,5247.324 175.105,5248.219 174,5248.219 M174,5239 C170.134,5239 167,5242.134 167,5246 C167,5249.866 174,5259 174,5259 C174,5259 181,5249.866 181,5246 C181,5242.134 177.866,5239 174,5239" id="pin_fill_sharp_circle-[#634]"></path>
+                      </g>
+                  </g>
+              </g>
+          </svg>
+              Corporate Office : 2 <sup>nd</sup> Floor, Sai Midas Touch, Near Doule Hospital, Savedi, Ahmednagar </span>
+          </div>
+          <div class="head-contact">
+            <span>
+              <svg width="28px" height="32px" viewBox="0 0 32 32" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:sketch="http://www.bohemiancoding.com/sketch/ns">
+                <title>icon 6 mail envelope closed</title>
+                <desc>Created with Sketch.</desc>
+                <defs></defs>
+                <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" sketch:type="MSPage">
+                    <g id="icon-6-mail-envelope-closed" sketch:type="MSArtboardGroup" fill="#ffffff">
+                        <path d="M5.31500722,9.27391933 C5.12106043,9.45739405 5,9.71770487 5,10.0068455 L5,21.9931545 C5,22.2828882 5.11915965,22.5440384 5.31310687,22.7277332 L5.31310687,22.7277332 L13.05,16 L5.31500722,9.27391933 L5.31500722,9.27391933 L5.31500722,9.27391933 Z M27.6868931,9.27226685 C27.8808404,9.45596162 28,9.71711185 28,10.0068455 L28,21.9931545 C28,22.2822951 27.8789396,22.542606 27.6849928,22.7260807 L19.95,16 L27.6868931,9.27226685 L27.6868931,9.27226685 Z M19.2018297,16.6505829 L26.5,23 L6.5,23 L13.7981703,16.6505829 L16.5,19 L19.2018297,16.6505829 L19.2018297,16.6505829 Z M6.00359486,8 C4.89703997,8 4,8.89451376 4,9.99406028 L4,22.0059397 C4,23.1072288 4.88976324,24 6.00359486,24 L26.9964051,24 C28.10296,24 29,23.1054862 29,22.0059397 L29,9.99406028 C29,8.8927712 28.1102368,8 26.9964051,8 L6.00359486,8 L6.00359486,8 Z M16.5,17.7000122 L26.5,9 L6.5,9 L16.5,17.7000122 L16.5,17.7000122 Z" id="mail-envelope-closed" sketch:type="MSShapeGroup"></path>
+                    </g>
+                </g>
+            </svg> 
+              ottahmednagar@gmail.com 
+              <svg width="24" height="24" viewBox="0 0 48 48" fill="" xmlns="http://www.w3.org/2000/svg">
+                <path d="M24 2C19.6488 2 15.3953 3.29028 11.7774 5.70767C8.15957 8.12506 5.33977 11.561 3.67464 15.581C2.00952 19.6009 1.57384 24.0244 2.42272 28.292C3.27159 32.5596 5.36689 36.4796 8.44365 39.5564C11.5204 42.6331 15.4404 44.7284 19.708 45.5773C23.9756 46.4261 28.3991 45.9905 32.419 44.3253C36.439 42.6602 39.8749 39.8404 42.2923 36.2225C44.7097 32.6047 46 28.3512 46 24C45.9934 18.1673 43.6734 12.5753 39.549 8.45096C35.4247 4.32659 29.8327 2.00662 24 2V2ZM42.318 32H36.13C36.6372 29.6995 36.9189 27.3551 36.971 25H43.949C43.8361 27.4132 43.2834 29.7854 42.318 32ZM4.05099 25H11.029C11.0811 27.3551 11.3628 29.6995 11.87 32H5.68199C4.71662 29.7854 4.16388 27.4132 4.05099 25V25ZM5.68199 16H11.87C11.3628 18.3005 11.0811 20.6449 11.029 23H4.05099C4.16388 20.5868 4.71662 18.2146 5.68199 16V16ZM25 14V4.092C28.639 4.692 31.764 8.528 33.512 14H25ZM34.075 16C34.6171 18.2958 34.9188 20.6418 34.975 23H25V16H34.075ZM23 4.092V14H14.488C16.236 8.528 19.361 4.692 23 4.092ZM23 16V23H13.028C13.0842 20.6418 13.3859 18.2958 13.928 16H23ZM13.028 25H23V32H13.925C13.3839 29.7041 13.0832 27.3581 13.028 25V25ZM23 34V43.908C19.361 43.308 16.236 39.472 14.488 34H23ZM25 43.908V34H33.512C31.764 39.472 28.639 43.308 25 43.908ZM25 32V25H34.972C34.9158 27.3582 34.6141 29.7042 34.072 32H25ZM36.971 23C36.9189 20.6449 36.6372 18.3005 36.13 16H42.318C43.2834 18.2146 43.8361 20.5868 43.949 23H36.971ZM41.294 14H35.613C34.7451 10.7415 33.113 7.73679 30.852 5.235C35.2483 6.8496 38.9419 9.95006 41.294 14V14ZM17.148 5.235C14.887 7.73679 13.2549 10.7415 12.387 14H6.70599C9.05805 9.95006 12.7517 6.8496 17.148 5.235V5.235ZM6.70599 34H12.387C13.2549 37.2585 14.887 40.2632 17.148 42.765C12.7517 41.1504 9.05805 38.0499 6.70599 34V34ZM30.852 42.765C33.113 40.2632 34.7451 37.2585 35.613 34H41.294C38.9419 38.0499 35.2483 41.1504 30.852 42.765Z" fill="white"/>
+                </svg>
+              www.onthistime.in</span>
+          </div>
+        </div>
+      </header> {% endcomment %}
+
+      <div class="container">
+        <center><h6 id="title">Release Order (RO)</h6></center>
+        <span id="ad-date">Date: {{ order.created }}</span>
+        <br>
+        <div class="ott-address">
+          <span>To,</span>
+          <div>
+            <span>The Advertising Manager,</span>
+          </div>
+          <span>On This Time Media</span>
+        </div>
         <br>
         <div class="agreement-container">
-            <p>I <b>{{ client_name }}</b> hearby give full permission to publish following advertisement/advertisements on On This Time Media Pvt Ltd</p>
-            <p>I agree to all the terms and conditions laid down by On This Time Media Pvt Ltd Ahmednagar</p>
-            <hr>
+            <p>Company Name : 
+                <span id="companyName" style="font-size: 1.4rem;"> 
+                  {{ order.client_id.company_name }}  
+                </span>
+            </p>
+            <p>Agree that On This Time Media and its assignees may use my image or its likeness to be used in any
+              form style or color for the purpose of marketing and advertising. I understand that the image can be
+              modified or altered using text or graphics in any way he/she feels appropriate</p>
+            
+            Client Name : 
+            <span>
+              <b>{{ order.client_id.name }}</b> 
+              GST No : <b>{{ order.client_id.gst_number }}</b>
+            </span>
+            Client Address : 
+            <p>{{ order.client_id.address }}</p>
+            <p>Mobile Number: {{ order.client_id.mobile_no }}
+              WhatsApp No: {{ order.client_id.whatsapp_mobile_no }} 
+              Email : {{ order.client_id.email }}
+            </p>
             <p>Following are the advertisements</p>
             <table class="table table-bordered text-center">
                 <thead class="table-light">
                   <tr>
-                    <th scope="col">Ad Number</th>
-                    <th scope="col">Ad Type</th>
-                    <th scope="col">Ad Rate</th>
-                    <th scope="col">Ad Publishing Date</th>
+                    <th scope="col">LOCATIONS</th>
+                    <th scope="col">SCHEDULED DATE & TIME</th>
+                    <th scope="col">AMOUNT</th>
                   </tr>
                 </thead>
                 <tbody class="table-group-divider">
-                    {% comment %} {% set count = 1 %} {% endcomment %}
-                    {%for advt in order.advt_set.all %}
-                        <tr>
-                            <th scope="row">{{ forloop.counter }}</th>
-                            <td>{{ advt.type.title }}</td>
-                            <td>{{ advt.type.rate }}</td>
-                            <td>{{ advt.ad_pub_date }}</td>
-                        </tr>
+                    {% for advt in order.advt_set.all %}
+                    <tr>
+                        <td>
+                            {% for x in advt.ad_locs.all %}
+                                 {{ x.location.name }} {{ x.location.type }} {{ x.location.rate }} ,
+                            {% endfor %}
+                        </td>
+                        <td>{{ advt.ad_pub_date }}</td>
+                        <td>{{ advt.ad_amt }}</td>
+                    </tr>
                     {% endfor %}
-                   
-               
                 </tbody>
               </table>
-              <div class="client-sign">
-                <h3>Client Signature</h3>
-                <br><br>
-                <h3>Marketer Signature</h3>
+              <h3>Total Bill : {{ total_bill_amt }}
+              {% if discounted_amt  %}
+                <span style="padding-left: 20px;">Discount given : {{ discounted_amt }}</span>
+                     {% comment %} <span style="padding-left: 10px;">New Bill : {{ final_bill_amt }}<span> {% endcomment %}
+              </h3>
+                
+                {% endif %}
+                </h2>
+                {% comment %} <h2>Final Total Bill: {{ final_bill_amt }}</h2> {% endcomment %}
+                {% if order.client_id.agency_id != None and order.order_status != order.Status.FRESH %}
+                  <h5>{{ order.agency_discount_percent }}% agency discount given</h5>
+                  <h5>{{ b4_agency_discount_bill }}(Total Bill) - {{ agency_discount_amt }} ({{ order.agency_discount_percent}}% discount) = <b>₹ {{ final_bill_amt }} </b></h5>
+                {% endif %}
+                {% if order.gst_relax_decision == True %}
+                  <h3>Final Total Bill (NO GST) <b>{{ final_bill_amt }}</b></h3>
+                {% else %}
+                  <h3>Final Total Bill + 18% GST: <b>{{ gst_final_bill_amt }}</b></h3>
+                {% endif %}
+
+
+                {% if order.order_status == order.Status.FRESH %}
+                <h3>Payment Status : Not Paid</h3>
+                {% else %}
+                    <h3>Payment Status : {{ order.order_status }}</h3>
+                {% endif %}
+              <div class="bank-account-details">
+                <p style="color: #006ea8; font-size: 1.4rem; font-weight: 1200;">Account Details For Sending Advertisement Payment</p>
+                <p><b>Bank Details : </b><span style=""> HDFC Bank Ltd</span></p>
+                <p><b>Account Holder Name :</b> <span style=""> Newsline Media</span> ♦ <b> Account Number : </b><span style="font-size: 1.5rem;"></span>50200058117562</span></p>
+                <p><b>IFSC Code : </b><span style="">HDFC0000181</span><b> ♦ Branch : </b><span style="font-size: 1.5rem;">Ahmednagar</span></span></p>
+              </div>
+              <div class="sign-container">
+                <p><b>Customer Copy</b></p>
+                <p><b>Executive Signature</b></p>
+                <p><b>Client Sign & Stamp</b></p>
               </div>
         </div>
 

@@ -1,0 +1,364 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title></title>
+    <style>
+        {% comment %} @import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@300&family=Roboto:wght@300&display=swap'); {% endcomment %}
+
+        @import url('https://fonts.googleapis.com/css2?family=Roboto&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@300&family=Roboto:wght@300;900&display=swap');
+        *{
+            /* font-family: "Times New Roman", Times, serif; */
+            font-family: 'Open Sans', sans-serif;
+            font-family: 'Roboto', sans-serif;
+            font-weight: 400;
+            /* letter-spacing: 2px; */
+
+        }
+        body .container{
+          padding-left: 5%;
+          padding-right: 5%;
+        }
+        header{
+          /* display: flex; */
+          margin: 10px 0;
+          display: -webkit-box;
+          width: 100%;
+        } 
+        header .head-content-container{
+          background-color: #006ea8;
+          width: 100%;
+          padding-left: 20px;
+          margin-left: 20px;
+        }
+        header .head-content-container .head-brand-name{
+          font-size: 1.8rem;
+          color: white;
+          
+        }
+        header .head-content-container .head-address{
+          color: white;
+          margin-top: 10px;          
+        }
+        
+        header .head-content-container .head-contact{
+          color: white;
+          margin-top: 10px;          
+          padding-bottom: 10px;          
+        }
+        .table-orders{
+          border-collapse: collapse;
+          width: 100%;
+          border-right: none;
+        }
+        .table-orders th{
+          padding-top: 12px;
+          padding-bottom: 12px;
+          text-align: left;
+          background-color: #1b1b1b;
+          color: white;
+          text-align: center;
+        }
+        .table-orders td{
+          border: 1px solid #ddd;
+          border-top: none;
+          border-right: none;
+          padding: 8px;
+        }
+        .table-orders .order-tr{
+          border:1px solid ddd;
+        }
+        .table-orders .order-tr td{
+          text-align: center;
+        }
+        .table-section {
+          font-family: Arial, Helvetica, sans-serif;
+          border-collapse: collapse;
+          width: 100%;
+          /* border: 1px solid black; */
+          /* margin: 0 auto; */
+        }
+        .table-section th{
+          text-align: center;
+        }
+        .table-section .advt-tr{
+          border: 1px solid #ddd;
+        }
+        .table-section .advt-tr td{
+          text-align: center
+        }
+        .table-section .advt-tr td:nth-child(2){
+          text-align: left;
+        }
+        .table-section .advt-head-tr th{
+          text-align: center;
+        }
+            .table-section table{
+                width: 100%;
+                border: none;
+                
+            }
+
+            .table-section td, .table-section th {
+                border: 1px solid #ddd;
+                border-top: none;
+                border-right: none;
+                padding: 8px;
+            }
+
+            .table-section tr:nth-child(even){
+                /* background-color: #e0dcdc; */
+            }
+
+            .table-section tr:hover {background-color: #ddd;}
+
+            .table-section th {
+                padding-top: 12px;
+                padding-bottom: 12px;
+                text-align: left;
+                background-color: #818181;
+                color: black;
+            }     
+         
+
+
+        
+        </style>
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-0evHe/X+R7YkIZDRvuzKMRqM+OrBnVFBL6DOitfPri4tjfHxaWutUpFmBp4vmVor" crossorigin="anonymous">
+</head>
+<body>
+    <div class='my-header'>
+      <img src="https://join.onthistime.news/static/images/ott-full-strip.png" width="100%" alt="OTT Logo & Address" />
+    </div>
+    <div class="container">
+        <center><h3 id="title">Order Report</h3></center>
+        <br>
+   
+        <br>
+        <div class="agreement-container">
+            <h3>Search Filters</h3>
+            {% load convert_filter %}
+            <div >
+                <h5 style="display: inline;">Start DateTime : <b>{{ start_date_time }}</b></h5>
+                <h5 style="display: inline;">End DateTime : <b>{{ end_date_time }}</b></h5>
+                <br>
+                {% if marketer %}
+                <h5>Marketer : <b>{{ marketer }}</b></h5>
+                {% else %}
+                All Marketers
+                {% endif %}
+            </div>
+            <p>Following are the Orders</p>
+            <table border=1 class="table-orders">
+              <thead>
+                
+              </thead>
+              <tbody>
+                {% for order in order_objs %}
+                <tr>
+                  <th>Client Type</th>
+                  <th>Order ID</th>
+                  <th>Total Ads in Order</th>
+                  <th>Client</th>
+                  <th>Marketer Name</th>
+                  <th>Bill Status</th>
+                  <th>Total Bill Amount</th>
+
+                  <th>Discount Status</th>
+                  {% if order.discount_decision == True %}
+                    <th>Discounted Amount</th>
+                    <th>Discount Allowed Admin </th>
+                  {% endif %}
+
+                  <th>GST Relaxed? </th>
+                  {% if order.gst_relax_decision == True %}
+                    <th>GST Accepted/Rejected Admin? </th>
+                    <th>If GST Relaxed? Amount Paid? </th>
+                    <th>Final Amount (with 18% GST)</th>
+                    {% if order.client_id.agency_id != None %}
+                      <th>Agency Discount percent</th>
+                      <th>Agency Discount Amt</th>
+                      <th>Final Amt</th>
+                    {% endif %}
+                  {% else %}
+                    <th>Final Amount (with 18% GST)</th>
+                  {% if order.client_id.agency_id != None %}
+                      <th>Agency Discount percent</th>
+                      <th>Agency Discount Amt</th>
+                      <th>Final Amt</th>
+                    {% endif %}
+                  {% endif %}
+                  <th>Order created Date</th>
+                  <th>Release Order Status</th>
+                  
+                  
+                </tr>
+                <tr class="order-tr">
+                  <td>
+                    {% if order.client_id.agency_id != None %}
+                      Agency Type
+                    {% else %}
+                      Direct Client
+                    {% endif %}
+                  </td>
+                  <td><b>{{ order.id }}</b></td>
+                  <td>{{ order.advt_set.all|length }}</td>
+                  <td>{{ order.client_id }}</td>
+                  <td>{{ order.marketer_id }}</td>
+                  <td>{{ order.order_status }}</td>
+                  <td>{{ order.total_bill_amt|convert_to_inr }}</td>
+                  <td>
+                    {% if order.discount_decision %}
+                    Given 
+                    {% else %}
+                    Not Given
+                    {% endif %}
+      
+                  </td>
+
+                  {% if order.discount_decision == True %}
+                    <td>
+                      {% if order.discount_decision %}
+                        <b>{{ order.discount_alloted_amt|convert_to_inr }}</b>
+                      {% else %}
+                        -
+                      {% endif %}
+                    </td>
+                    <td>
+                      {% if order.discount_decision %}
+                        {{ order.discount_allowed_or_rejected_admin }}
+                      {% else %}
+                        -
+                      {% endif %}
+                    </td>
+                  {% endif %}
+
+                  <td>
+                    {% if order.gst_relax_decision == True%}
+                      Yes
+                    {% elif order.gst_relax_decision == True %}
+                      Rejected
+                    {% else %}
+                      Not Asked
+                    {% endif %}
+                  </td>
+                  {% if order.gst_relax_decision == True%}
+
+                      <td>
+                        {% if order.gst_relax_decision == True%}
+                          {{ order.gst_allowed_or_rejected_admin}}
+                        {% elif order.gst_relax_decision == False %}
+                        No
+                        {% else %}
+                        - 
+                        {% endif %}
+                        
+                      </td>
+                      <td>
+                        {% if order.gst_relax_decision == True %}
+                        <b>{{ order.final_bill_amt|convert_to_inr }}</b>
+                        {% else %}
+                        - 
+                        {% endif %}
+                      </td>
+                      <td>
+                        {% if order.gst_relax_decision == True %}
+                          -
+                        {% else %}
+                          <b>{{ order.gst_final_bill_amt|convert_to_inr }}</b>
+                        {% endif %}
+                      </td>
+                      {% if order.client_id.agency_id != None %}
+                        <td>{{ order.agency_discount_percent }}</td>
+                        <td>{{ order.agency_discount_amt|convert_to_inr }}</td>
+                        <td>{{ order.final_bill_amt|convert_to_inr }}</td>
+                        {% endif %}
+                        <td>{{ order.gst_final_bill_amt|convert_to_inr }}</td>
+                  {% else %}
+                  <td>{{ order.gst_final_bill_amt|convert_to_inr }}</td>
+                    {% if order.client_id.agency_id != None %}
+                          <td>{{ order.agency_discount_percent }}%</td>
+                          <td>{{ order.agency_discount_amt|convert_to_inr }}</td>
+                          <td>{{ order.final_bill_amt|convert_to_inr }}</td>
+                    {% endif %}
+                  {% endif %}
+
+
+                  <td>{{ order.created }}</td>
+                  <td>
+                    {% if order.signed_release_order %}
+                    Done
+                    {% else %}
+                    Not Uploaded
+                    {% endif %}
+                  </td>
+                </tr>
+                <tr class="fold">
+                  <td colspan="10">
+                    <div class="fold-content table-section">
+                      <p>Total Ads in this order are as follow: </p>
+                      <table>
+                        <thead>
+                          <tr class="advt-head-tr">
+                            <th>Ad ID</th>
+                            <th>Ad Locations & Types</th>
+                            <th>Amount</th>
+                            <th>Ad Publishing Date</th>
+                            <th>Publishing Status</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                            {% for advt in order.advt_set.all %}
+                            
+                              <tr class="advt-tr">
+                                  <td>{{ advt.id }}</td>
+          
+                                  <td>
+                                    {% for ad_loc in advt.ad_locs.all %}
+                                      {{ ad_loc }} <br>
+                                    {% endfor %}
+                                  </td>
+                                  <td>{{ advt.ad_amt }}</td>
+                                  <td>{{ advt.ad_pub_date }}</td>
+                                  <td>
+                                    {% if advt.is_published %}
+                                      Published on {{ advt.ad_pub_actual_date }}
+                                      {% else %}
+                                      Not Published
+                                    {% endif %}
+                                  </td>
+                                  
+                              </tr>
+                          {% endfor  %}
+                          
+                        </tbody>
+                      </table>
+                      <br>
+                    </div>
+                  </td>
+                </tr>
+                {% endfor %}
+
+                  </tbody>  
+                </table>
+            
+              {% comment %} <h2>Total Bill : {{ total_bill_amt }}
+              {% if discounted_amt  %}
+                <span style="padding-left: 20px;">Discount given : {{ discounted_amt }}</span></h2>
+                {% endif %}
+                </h2>
+                <h2>Final Total Bill + 18% GST: <b>{{ gst_final_bill_amt }}</b></h2>
+                {% if order.order_status == Order.Status.FRESH %}
+                <h3>Payment Status : None</h3>
+                {% else %}
+                    <h3>Payment Status : {{ order.order_status }}</h3>
+                {% endif %} {% endcomment %}
+             
+        </div>
+
+    </div>
+        
+    </body>
+</html>

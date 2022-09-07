@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Marketer Home</title>
+    <title>Edit Order | Executive</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-0evHe/X+R7YkIZDRvuzKMRqM+OrBnVFBL6DOitfPri4tjfHxaWutUpFmBp4vmVor" crossorigin="anonymous">
     <!-- <link rel="stylesheet" href="{% static "assets/css/style.css" %}" /> -->
     <!-- CSS only -->
@@ -130,14 +130,16 @@
           width: 100%;
         }
       }
-
+      .imp-amt{
+        font-weight: 550;
+      }
     </style>
 </head>
 <body>
 
   <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
     <div class="container-fluid">
-      <a class="navbar-brand" href="#">OTT Media</a>
+      <a class="navbar-brand" href="{% url 'marketer_edit_ads' %}">OTT Media</a>
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
@@ -175,14 +177,23 @@
     </div>
   </nav>
 
+  {% load convert_filter %}
+
   <div class="container my-3">
     <div class="row gx-5">
         <div class="col">
           <div class="p-3 border bg-light">
-            <h3>There are total<b> {{ order.advt_set.all|length }}</b> Ad(s) In this order of client : <b>{{ order.client_id.name}}</b> </h3>
+            <h3>There are total<b> {{ order.advt_set.all|length }}</b> Ad(s) In this order of client : <b>{{ order.client_id.name}}</b> 
+              {% if order.client_id.agency_id != None %}
+              Agency : <span class="badge rounded-pill text-bg-dark">{{ order.client_id.agency_id }}</span>
+              {% endif %}
+            </h3>
           </div>
         </div>
       </div>
+
+  {% if totalAds > 0 %}
+
 
     <div class="accordion mt-3" id="accordionPanelsStayOpenExample">
       <div class="accordion-item">
@@ -191,14 +202,32 @@
            <b>Click here to view Ads in the order </b>
           </button>
         </h2>
+
       {% for ad in order.advt_set.all %}
         <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#accordionExample">
           <div class="accordion-body">
             <div class="ad-container" data-id="{{ ad.id }}">
-              <h6>Ad Type : <b>{{ ad.type.title }}</b> <br><h6>
-              <h6>Ad Amount : <b>₹ {{ ad.type.rate }}</b> <br></h6>
+              <h6>Ad Location(s) : <b>
+                Total : {{ ad.ad_locs.all|length }} [{% for x in ad.ad_locs.all %}
+                <i>{{ x.location.name  }}</i> type : {{ x.location.type }} ₹ : {{ x.location.rate }},
+                {% endfor %}]
+              </b> <br><h6>
+              <h6>Ad Amount : <b>₹ {{ ad.ad_amt|convert_to_inr }}</b> <br></h6>
               <h6>Publishing On : <b>{{ ad.ad_pub_date }}</b></h6>
-              
+              {% if orderviewform %}
+                {% if order.discount_requested == True %}
+                {% comment %} <button class="btn btn-outline-danger" disabled>Remove Ad</button> {% endcomment %}
+                {% else %}
+                {% comment %} Do now show remove ad button if discount is asked {% endcomment %}
+                {% endif %}
+              {% else %}
+                {% if order.discount_requested == True %}
+
+                {% else %} 
+                  <button class="btn btn-outline-danger" onclick="removeAdBtnEvent(this)">Remove Ad</button>
+                {% endif %}
+                
+              {% endif %}
             </div>
             {% comment %} <strong>This is the first item's accordion body.</strong> It is shown by default, until the collapse plugin adds the appropriate classes that we use to style each element. These classes control the overall appearance, as well as the showing and hiding via CSS transitions. You can modify any of this with custom CSS or overriding our default variables. It's also worth noting that just about any HTML can go within the <code>.accordion-body</code>, though the transition does limit overflow. {% endcomment %}
           </div>
@@ -210,109 +239,508 @@
     <div class="row gx-5 mt-3">
       <div class="col">
         <div class="p-3 border bg-light">
-          <h3>
-            Total Bill value : 
-            <span id="totalBillAmt">{{ order.total_bill_amt }} </span> 
             
-          </h3>
+            {% if order.discount_decision == True %}
+                <h4>Discount request has been accepted</h4>
+                <h4>Orignal Bill Amount : <span class="imp-amt">{{ order.total_bill_amt|convert_to_inr }}</span> </h4>
+                <h4>Dicount given amount: <span class="imp-amt">{{ order.discount_alloted_amt|convert_to_inr }}</span> New discounted total : <span class="imp-amt">{{ discounted_new_bill|convert_to_inr }}</span></h4>
+                {% if order.gst_relax_decision == True %}
+                  <h4>Gst Relax Accepted </h4>
+                  <h4>Payable Amount (NO GST) : <b>{{ order.final_bill_amt|convert_to_inr }}</b> </h4>
+                {% elif order.gst_relax_decision == False %}
+                  <h4>Gst Relax Declined </h4>
+                  <h4>Payable Amount (18% GST) : <b>{{ order.gst_final_bill_amt|convert_to_inr }}</b></h4>
+                {% else %}
+                  <h4>Payable Amount (18% GST) : <b>{{ order.gst_final_bill_amt|convert_to_inr }}</b></h4>
+                {% endif %}
+            {% else %}
+              <h3>Total Bill value : 
+                <span id="totalBillAmt">{{ order.total_bill_amt|convert_to_inr }} </span> 
+              </h3>
+              
+              {% if order.discount_decision == False  %}
+                <h4>Discount request has been rejected </h4>
+              {% endif %}
+              {% if order.gst_relax_decision == True %}
+              <h4>Gst Relax Accepted </h4>
+              <h4>Payable Amount (NO GST) : <b>{{ order.final_bill_amt|convert_to_inr }}</b> </h4>
+              {% elif order.gst_relax_decision == False %}
+                <h4>Gst Relax Declined </h4>
+                <h4>Payable Amount (18% GST) : <b>{{ order.gst_final_bill_amt|convert_to_inr }}</b></h4>
+              {% else %}
+                <h4>Payable Amount (18% GST) : <b>{{ order.gst_final_bill_amt|convert_to_inr }}</b></h4>
+
+              {% endif %}
+            {% endif %}
+            {% if order.client_id.agency_id != None %}
+                      {% comment %} Didi {% endcomment %}
+                      {% if order.agency_discount_given == True %}
+                            <h5><b>{{ order.agency_discount_percent }}% agency discount given</b></h5>
+                            <h5>{{ order.b4_agency_discount_bill|convert_to_inr }}(Total Bill) - {{ order.agency_discount_amt|convert_to_inr }} ({{ order.agency_discount_percent}}% discount) = <b>₹ {{ order.final_bill_amt|convert_to_inr }}</b></h5>
+                      {% endif %}
+
+                {% endif %}
+            
         </div>
       </div>
     </div>
-    {% if orderviewform %}
-      <div class="row">
-        <div class="form-group col-md-6">
-          <label for="modeOfPayment">{{ orderviewform.mode_of_pay.label }}</label>
-          {{ orderviewform.mode_of_pay }}
-        </div>
-        <div class="form-group col-md-6">
-          <label for="transaction_id">{{ orderviewform.trans_id.label }}</label>
-          {{ orderviewform.trans_id }}
-                   
-        </div>
 
-        </div>  
-      </div>
-       
-         
+
+    {% comment %} <a href="{% url 'generate_ro' '_' %}" class="btn btn-warning mt-4 mb-4" id="generateRoLink">Generate RO</a> {% endcomment %}
+    
+    
+    {% comment %} New Start {% endcomment %}
+
+  {% if order.order_status ==  order.Status.FRESH %}
+    {% comment %} Show discount question? and also RO {% endcomment %}
+      {% if order.discount_requested == True %} 
+
+        {% if order.discount_decision == None %}
+          <h3>
+            You have requested a discount of Rs :<b> {{ order.discount_req_amt|convert_to_inr }} </b><br>
+            Please wait for 24-36 hours...
+          </h3>
+          <h5>Discount decision status : Pending</h5>
+          {% comment %} Check for gst relax status {% endcomment %}
+          {% if order.gst_relax_requested == True %}
+            
+            {% if order.gst_relax_decision == True %}
+              {% comment %} <h4>GST Relax request has been Accepted </h4>
+              <h5>New Amount : <b>{{ order.final_bill_amt }} </b></h5> {% endcomment %}
+
+            {% elif order.gst_relax_decision == None %}
+
+              <h1>Code will NEVER NEVER NEVER come here!!!</h1>
+
+            {% elif order.gst_relax_decision == False %}
+              <h4>GST Relax request has been Rejected</h4>
+            {% endif %}
+          {% else %}
+           <h5>You can request for GST Relax once discount request is either accepted or rejected</h5>
+          {% endif %}
+
+        {% elif order.discount_decision == False %}
+             {% comment %} Discount is NOT given {% endcomment %}
+            {% if order.gst_relax_requested == True %}
+                
+              {% if order.gst_relax_decision == True %}
+
+                  {% comment %} GST Relax is Accepted, now pay full amount without GST & Discount! {% endcomment %}
+                  <a href="{% url 'generate_ro' '_' %}" class="btn btn-warning mt-4 mb-4" id="generateRoLink">Generate RO</a>
+                  <h5>Upload Client Signed & Stamped Photo of Relase Order (RO) </h5>
+                  {% if order.signed_release_order == "" %}
+                    {% include "marketer/snips/ro_upload_form_container.html" with showForm=True  %}
+                  {% else %}
+                    {% include "marketer/snips/ro_upload_form_container.html" with showForm=False  %}
+                
+                  {% endif %}
+                  {% include "marketer/snips/show_mop_container.html" %}
+
+              {% elif order.gst_relax_decision == None %}
+                <h5>Discount request has not been accepted</h5>
+                <h5>GST relax request is in <b>Pending</b>, Please wait for 24-36 hours...</h5>
+
+              {% elif order.gst_relax_decision == False %}
+                  {% comment %} <h5>Discount request has not been accepted</h5>
+                  <h5>GST Relax request has not been accepted</h5> {% endcomment %}
+                  <h6>You have to pay Full Bill Amount : <b>{{ order.total_bill_amt }}</b></h6>
+
+                  <a href="{% url 'generate_ro' '_' %}" class="btn btn-warning mt-4 mb-4" id="generateRoLink">Generate RO</a>
+                  <h5>Upload Client Signed & Stamped Photo of Relase Order (RO) </h5>
+                  {% if order.signed_release_order == "" %}
+                    {% include "marketer/snips/ro_upload_form_container.html" with showForm=True  %}
+                  {% else %}
+                    {% include "marketer/snips/ro_upload_form_container.html" with showForm=False  %}
+                
+                  {% endif %}
+                  {% include "marketer/snips/show_mop_container.html" %}
+
+              {% endif %}
+
+            {% else %}
+              {% comment %} GST Relax not request {% endcomment %}
+              <h4>Discout request for ₹ {{ order.discount_req_amt|convert_to_inr }} has been rejected</h4>
+              {% include "marketer/snips/ask_for_gst_relax_form.html" %}
+              <a href="{% url 'generate_ro' '_' %}" class="btn btn-warning mt-4 mb-4" id="generateRoLink">Generate RO</a>
+              <h5>Upload Client Signed & Stamped Photo of Relase Order (RO) </h5>
+              {% if order.signed_release_order == "" %}
+                {% include "marketer/snips/ro_upload_form_container.html" with showForm=True  %}
+              {% else %}
+                {% include "marketer/snips/ro_upload_form_container.html" with showForm=False  %}
+            
+              {% endif %}
+              {% include "marketer/snips/show_mop_container.html" %}
+
+            {% endif %}
+
+
+        {% elif order.discount_decision == True %}
+              {% if order.gst_relax_requested == True %}
+                      
+              {% if order.gst_relax_decision == True %}
+                    {% comment %} <h3>GST Relax Request is Accepted</h3> {% endcomment %}
+                    <a href="{% url 'generate_ro' '_' %}" class="btn btn-warning mt-4 mb-4" id="generateRoLink">Generate RO</a>
+                    <h5>Upload Client Signed & Stamped Photo of Relase Order (RO) </h5>
+                    {% if order.signed_release_order %}
+                      <a href="#" id="myImg" data-src='{{ order.signed_release_order.url }}' showForm=False>View uploaded RO</a>
+                      {% include "marketer/snips/ro_upload_form_container.html" with showForm=False  %}
+                    {% else %}
+                      {% comment %} Not uploaded RO {% endcomment %}
+                      {% include "marketer/snips/ro_upload_form_container.html" with showForm=True  %}
+                    {% endif %}
+                    
+                    {% include "marketer/snips/show_mop_container.html" %}
+              
+              {% elif order.gst_relax_decision == None %}
+                <h3>GST relax request is still in pending</h3>
+                <h4>Please wait for 24-36 hours </h4>
+
+              {% elif order.gst_relax_decision == False %}
+                  <h3>GST relax request is Rejected</h3>
+                  <a href="{% url 'generate_ro' '_' %}" class="btn btn-warning mt-4 mb-4" id="generateRoLink">Generate RO</a>
+                    <h5>Upload Client Signed & Stamped Photo of Relase Order (RO) </h5>
+                    {% if order.signed_release_order %}
+                    <a href="#" id="myImg" data-src='{{ order.signed_release_order.url }}' showForm=False>View uploaded RO</a>
+                      
+                      {% include "marketer/snips/ro_upload_form_container.html" with showForm=False  %}
+                    {% else %}
+                      {% comment %} Not uploaded RO {% endcomment %}
+                      {% include "marketer/snips/ro_upload_form_container.html" with showForm=True  %}
+                    {% endif %}
+                    
+                    {% include "marketer/snips/show_mop_container.html" %}
+
+              {% endif %}
+        {% elif order.gst_relax_requested == False %}
+          {% comment %} <h3>You have not requested for GST relax...</h3> {% endcomment %}
+          {% include "marketer/snips/ask_for_gst_relax_form.html" %}
+            <a href="{% url 'generate_ro' '_' %}" class="btn btn-warning mt-4 mb-4" id="generateRoLink">Generate RO</a>
+            <h5>Upload Client Signed & Stamped Photo of Relase Order (RO) </h5>
+            {% if order.signed_release_order %}
+              
+              {% include "marketer/snips/ro_upload_form_container.html" with showForm=False  %}
+            {% else %}
+              {% comment %} Not uploaded RO {% endcomment %}
+              {% include "marketer/snips/ro_upload_form_container.html" with showForm=True  %}
+            {% endif %}
+            
+            {% include "marketer/snips/show_mop_container.html" %}
+
+        {% endif %}
+
+      {% endif %}
+        
+      {% elif order.discount_requested == False %}
+            {% comment %} Discount is not yet requested {% endcomment %}
+            {% if order.gst_relax_requested == True %}
+
+            {% if order.gst_relax_decision == True %}
+                <h3>GST Relax Request is Accepted</h3>
+                <a href="{% url 'generate_ro' '_' %}" class="btn btn-warning mt-4 mb-4" id="generateRoLink">Generate RO</a>
+                <h5>Upload Client Signed & Stamped Photo of Relase Order (RO) </h5>
+                {% if order.signed_release_order == "" %}
+                    {% include "marketer/snips/ro_upload_form_container.html" with showForm=True  %}
+                  {% else %}
+                  {% include "marketer/snips/ro_upload_form_container.html" with showForm=False  %}
+                {% endif %}
+                {% include "marketer/snips/ask_for_discount_form.html" %}
+
+                <div class="payment-container">
+                  {% include "marketer/snips/show_mop_container.html" %}
+                </div>
+            {% elif order.gst_relax_decision == None %}
+              <h3>GST relax request is still pending... </h3>
+              <h3>Please check in 24-36 hours </h3>
+            {% elif order.gst_relax_decision == False %}
+                <h3>GST Relax request has been rejected </h3>
+                <a href="{% url 'generate_ro' '_' %}" class="btn btn-warning mt-4 mb-4" id="generateRoLink">Generate RO</a>
+                <h5>Upload Client Signed & Stamped Photo of Relase Order (RO) </h5>
+                {% if order.signed_release_order == "" %}
+                    {% include "marketer/snips/ro_upload_form_container.html" with showForm=True  %}
+                  {% else %}
+                  {% include "marketer/snips/ro_upload_form_container.html" with showForm=False  %}
+                {% endif %}
+                {% include "marketer/snips/ask_for_discount_form.html" %}
+
+                <div class="payment-container">
+                  {% include "marketer/snips/show_mop_container.html" %}
+                </div>
+                
+            {% endif %}
+                  
+          {% else %}
+              <a href="{% url 'generate_ro' '_' %}" class="btn btn-warning mt-4 mb-4" id="generateRoLink">Generate RO</a>
+              <h5>Upload Client Signed & Stamped Photo of Relase Order (RO) </h5>
+              {% if order.signed_release_order == "" %}
+                  {% include "marketer/snips/ro_upload_form_container.html" with showForm=True  %}
+                {% else %}
+                {% include "marketer/snips/ro_upload_form_container.html" with showForm=False  %}
+              {% endif %}
+              {% include "marketer/snips/ask_for_discount_form.html" %}
+
+              {% include "marketer/snips/ask_for_gst_relax_form.html" %}
+
+              <div class="payment-container">
+                {% include "marketer/snips/show_mop_container.html" %}
+              </div>
+          
+          {% endif %}
+          
+
+        {% endif %}
+        {% if order.discount_requested == True %}
+        {% endif %}
+
+  {% elif order.order_status == order.Status.IN_REVIEW %}
+      {% comment %} Orer status is IN_REVIEW {% endcomment %}
+                <a href="{% url 'generate_ro' '_' %}" class="btn btn-warning mt-4 mb-4" id="generateRoLink">Generate RO</a>
+                <h5>Upload Client Signed & Stamped Photo of Relase Order (RO) </h5>
+                {% if order.signed_release_order == "" %}
+                    {% include "marketer/snips/ro_upload_form_container.html" with showForm=True  %}
+                  {% else %}
+                  {% include "marketer/snips/ro_upload_form_container.html" with showForm=False  %}
+                {% endif %}
+                <div class="row gx-5">
+                  <div class="col">
+                    <div class="p-1 border bg-light mt-3">
+                      <h5>
+                        Total Bill Amount : <b>₹ {{ order.total_bill_amt|convert_to_inr }}</b>
+                      </h5>
+                    </div>
+                  </div>
+                </div>
+              {% comment %} If discount is given {% endcomment %}
+                {% if order.discount_decision == True %}
+                      {% if order.gst_relax_decision == True %}
+                      <div class="p-1 border bg-light mt-3">
+                        <h5>
+                          Discount given : <b> ₹ {{ order.discount_alloted_amt|convert_to_inr }}</b>
+                        </h5>
+                      </div>
+                      
+                      <div class="p-1 border bg-light mt-3">
+                          <h5>
+                            GST Relax Given, New Bill Amount : <b>₹ {{ order.final_bill_amt|convert_to_inr }}</b>
+                          </h5>
+                      </div>
+                    
+                    {% else %}
+
+                      <div class="row gx-5">
+                        <div class="col">
+                          <div class="p-1 border bg-light mt-3">
+                            <h5>
+                              Discount given : <b> ₹ {{ order.discount_alloted_amt|convert_to_inr }} </b> New Bill : <b>₹ {{ order.final_bill_amt|convert_to_inr }} </b> 
+                            </h5>
+                          </div>
+                          <div class="p-1 border bg-light mt-3">
+                            <h5>
+                              New Bill Amount with (18% GST ): <b>₹ {{ order.gst_final_bill_amt|convert_to_inr }}</b>
+                            </h5>
+                          </div>
+                        </div>
+                      </div>
+                      
+
+                    {% endif %}
+            
+                {% else %}
+                    {% if order.gst_relax_decision == True %}
+                      <div class="row gx-5">
+                          <div class="col">
+                            <div class="p-1 border bg-light mt-3">
+                              <h5>
+                                Discount not given
+                              </h5>
+                            </div>
+                            <div class="p-1 border bg-light mt-3">
+                              <h5>
+                                GST Relax Given, New Bill Amount : <b>₹ {{ order.final_bill_amt|convert_to_inr }}</b>
+                              </h5>
+                            </div>
+                          </div>
+                      </div>
+
+                    {% else %}
+                        <div class="row gx-5">
+                          <div class="col">
+                            <div class="p-1 border bg-light mt-3">
+                              <h5>
+                                Discount not given
+                              </h5>
+                            </div>
+                            <div class="p-1 border bg-light mt-3">
+                              <h5>
+                                New Bill Amount with (18% GST ): <b>₹ {{ order.gst_final_bill_amt|convert_to_inr }}</b>
+                              </h5>
+                            </div>
+                          </div>
+                        </div>
+                      
+
+                    {% endif %}
+                    
+              {% comment %} If discount is NOT given {% endcomment %}
+                {% comment %} Not Given discount {% endcomment %}
+              {% endif  %}
+                {% if order.client_id.agency_id != None %}
+                <div class="row gx-5">
+                  <div class="col">
+                    <div class="p-1 border bg-light mt-3">
+                      {% comment %} Didi {% endcomment %}
+                      {% comment %} <h4 class="mt-4"><span class="badge bg-dark">{{ order.client_id.agency_id.agency_name }}</span> Agency has bought this client</h4> {% endcomment %}
+                      {% comment %} <h4 class="mt-4"><span class="badge bg-dark">{{ order.client_id.agency_id.agency_name }}</span> Agency has bought this client</h4> {% endcomment %}
+                      
+                      {% comment %} <h4 class="mt-4"><span class="badge bg-dark">{{ order.client_id.agency_id.agency_name }}</span> </h4> {% endcomment %}
+                      {% if order.agency_discount_given == True %}
+                            <h5>{{ order.agency_discount_percent }}% agency discount given</h5>
+                            <h5>{{ order.b4_agency_discount_bill|convert_to_inr }}(Total Bill) - {{ order.agency_discount_amt|convert_to_inr }} ({{ order.agency_discount_percent}}% discount) = <b>₹ {{ order.final_bill_amt|convert_to_inr }}</b></h5>
+                      {% endif %}
+
+                    </div>
+                  </div>
+                </div>
+                {% endif %}
+              
+              <h5 class="mt-4">Order's Payment is in <span class="badge bg-secondary">Review</span>, Please wait for 24-48 hours to confirm payment</h5>
+              <div class="row">
+                <div class="form-group col-md-6">
+                  <label for="modeOfPayment">{{ orderviewform.mode_of_pay.label }}</label>
+                  {{ orderviewform.mode_of_pay }}
+                </div>
+                <div class="form-group col-md-6">
+                  <label for="transaction_id">{{ orderviewform.trans_id.label }}</label>
+                  {{ orderviewform.trans_id }}
+                </div>
+              </div>
+
+      {% elif order.order_status == order.Status.ACCEPTED %}
+
+                  <a href="{% url 'generate_ro' '_' %}" class="btn btn-warning mt-4 mb-4" id="generateRoLink">Generate RO</a>
+                  <h5>Upload Client Signed & Stamped Photo of Relase Order (RO) </h5>
+                  {% if order.signed_release_order == "" %}
+                    <b>Please note that Ad will NOT be published unless Client Signed RO is uploaded</b>
+                      {% include "marketer/snips/ro_upload_form_container.html" with showForm=True  %}
+                  {% else %}
+                    
+                    <a href="#" id="myImg" data-src='{{ order.signed_release_order.url }}'>View uploaded RO</a>
+                    {% include "marketer/snips/ro_upload_form_container.html" with showForm=False viewImage=False  %}
+                  {% endif %}
+
+                    {% comment %} Show MOP Info {% endcomment %}
+                    <div class="row">
+                      <div class="form-group col-md-6">
+                        <label for="modeOfPayment">{{ orderviewform.mode_of_pay.label }}</label>
+                        {{ orderviewform.mode_of_pay }}
+                      </div>
+                      <div class="form-group col-md-6">
+                        <label for="transaction_id">{{ orderviewform.trans_id.label }}</label>
+                        {{ orderviewform.trans_id }}
+                      </div>
+                    </div>
+
+                {% comment %} check only if discount was request or not {% endcomment %}
+                {% if order.discount_requested == True %}
+                    
+                    {% comment %} If discount was alloted or not to the accepted order{% endcomment %}                    
+                    {% if order.discount_decision == True %}
+                      {% comment %} Discount was given {% endcomment %}
+                      <div class="p-1 border bg-light mt-3">
+                        <h5>
+                          Discount given : <b> ₹ {{ order.discount_alloted_amt}}</b>
+                        </h5>
+                      </div>
+                      <div class="p-1 border bg-light mt-3">
+                        <h5>
+                          Discounted New Bill Amount : <b>₹ {{ order.discounted_new_bill_amt }}</b>
+                        </h5>
+                      </div>
+
+                {% elif  order.discount_decision == False %}
+                      {% comment %} Discount was not given {% endcomment %}
+                        <h4>Discount appeal was rejected</h4>
+                    {% endif %}
+                {% endif %}
+                
+                {% if order.client_id.agency_id != None %}
+                  <div class="row gx-5">
+                    <div class="col">
+                      <div class="p-1 border bg-light mt-3">
+                        <h5>
+                          {% comment %} Didi {% endcomment %}
+                          {% if order.agency_discount_given == True %}
+                            <h5>{{ order.agency_discount_percent }}% agency discount given</h5>
+                            <h5>{{ order.b4_agency_discount_bill|convert_to_inr }}(Total Bill) - {{ order.agency_discount_amt|convert_to_inr }} ({{ order.agency_discount_percent}}% discount) = <b>₹ {{ order.final_bill_amt|convert_to_inr }}</b></h5>
+                          {% endif %}
+                        </h5>
+                      </div>
+                    </div>
+                  </div>
+                {% endif %}
+
+                <h4 class="mt-4">Order's payment has been <span class="badge bg-success">Confirmed</span> as recieved</h4>
+                <h4 class="mt-4">Goto View/Edit Ad if you want to edit anything in order</h4>
+
+
+      {% elif order.order_status == order.Status.REJECTED %}
+                {% if order.client_id.agency_id != None %}
+                <div class="row gx-5">
+                  <div class="col">
+                    <div class="p-1 border bg-light mt-3">
+                      <h5>
+                        {% comment %} Didi {% endcomment %}
+                        {% if order.agency_discount_given == True %}
+                          <h5>{{ order.agency_discount_percent }}% agency discount given</h5>
+                          <h5>{{ order.b4_agency_discount_bill|convert_to_inr }}(Total Bill) - {{ order.agency_discount_amt|convert_to_inr }} ({{ order.agency_discount_percent}}% discount) = <b>₹ {{ order.final_bill_amt|convert_to_inr }}</b></h5>
+                        {% endif %}
+                      </h5>
+                    </div>
+                  </div>
+                </div>
+              {% endif %}
+              <h4 class="mt-4">Order's payment has been <span class="badge bg-danger">Rejected</span> </h4>
+              <h5>Please contact accountant as soon as possible</h5>
+              <p><b>Accountant msg : </b>{{ order.bill_status_msg }}</p>
+
       {% endif %}
       
-      {% if order.order_status == order.Status.ACCEPTED %}
-        <h3>Payment is Accepted & Approved by accountant</h3>
-        {% elif order.order_status == order.Status.IN_REVIEW %}
-        <h3>Payment is in Review</h3>
-      {% endif %}
 
-      <br>
-      <a href="{% url 'generate_ro' order.order_id %}" class="btn btn-lg btn-warning">Generate RO</a>
-      {% if order.order_status == order.Status.REJECTED %}
-        <h2>Payment was not received for this Order!</h2>
-        <h4>Please contact accountant as soon as possible</h4>
-      {% else %}
-            
-            {% if order.signed_release_order %}
-            <h2>RO is successfully uploaded</h2>
-            <a href="#" id="myImg" data-src='{{ order.signed_release_order.url }}'>View RO</a>
-              {% if order.bill_status == True %}
-                <p>Accountant has verified payment, now RO cannot be re-uploaded</p>
-                {% else %}
-                {% comment %} Only can edit RO b4 it's been approved by accountant {% endcomment %}
-                <div class="mt-4" id="reupload-btn-container">
-                  <button class="btn btn-primary" id="reuploadRoBtn">Re-upload RO</button>
-                  <p>Please note that client signed RO can be only edited till Order is confirmed by accountant</p>
-                </div>
-                <div class="reupload-ro-container" style="display: none">
-                  <form method="post" id="myForm" enctype="multipart/form-data">
-                      <div class="row mt-3">
-                        {% csrf_token %}
-                          <!-- <div class="form-group col-md-12"> -->
-                            <!-- <label for="signed_release_order">Upload the image of Release Order (RO) signed & stamped by client</label>
-                            <input type="file" class="form-control" name="signed_release_order" id="signed_release_order" required> -->
-                            {{ form.as_p }}
-                          <!-- </div> -->
-                      </div>
-                      
-                      <div class="row mt-3">
-                          <div class="form-group col-md-12">
-                              <input type="submit" class="btn btn-success" value="Submit RO">
-                          </div>
-                      </div>
-                    </form>
-                </div>
-                {% endif %} 
-                {% comment %} END if statement of bill_status = True {% endcomment %}
-            
-            {% else %}
-            
-                <form method="post" id="myForm" enctype="multipart/form-data">
-                    <div class="row mt-3">
-                        {% csrf_token %}
-                          <!-- <div class="form-group col-md-12"> -->
-                            <!-- <label for="signed_release_order">Upload the image of Release Order (RO) signed & stamped by client</label>
-                            <input type="file" class="form-control" name="signed_release_order" id="signed_release_order" required> -->
-                            {{ form.as_p }}
-                          <!-- </div> -->
-                      </div>
-                      
-                      <div class="row mt-3">
-                          <div class="form-group col-md-12">
-                              <input type="submit" class="btn btn-success" value="Submit RO">
-                          </div>
-                      </div>
-                      </form>
-            {% endif %}
-            {% comment %} 'RO was uploaded' or not if statement closed {% endcomment %}
-        
-      {% endif %}
-      {% comment %} 'Payment NOT received' if statement closed {% endcomment %}
+      {% comment %} New Start END {% endcomment %}
+
+
+  {% else %} 
+    {% comment %} Incase where Ads are 0 {% endcomment %}
+    
+    <svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+      <symbol id="info-fill" fill="currentColor" viewBox="0 0 16 16">
+        <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm.93-9.412-1 4.705c-.07.34.029.533.304.533.194 0 .487-.07.686-.246l-.088.416c-.287.346-.92.598-1.465.598-.703 0-1.002-.422-.808-1.319l.738-3.468c.064-.293.006-.399-.287-.47l-.451-.081.082-.381 2.29-.287zM8 5.5a1 1 0 1 1 0-2 1 1 0 0 1 0 2z"/>
+      </symbol>
+    </svg>
+    
+    <div class="alert alert-primary d-flex align-items-center mt-3" role="alert">
+      <svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="Info:"><use xlink:href="#info-fill"/></svg>
+      <div>
+        Add Ads to the cart to view ads here... 
+      </div>
+    </div>
+    
+    
+    {% endif %}
+
+    
+    
+      <!-- <a class="btn btn-lg btn-warning" href="{% url 'generate_ro'  order.order_id  %} ">Generate RO</a> -->
+
+      <br><br><br><br><br><br><br><br><br>
   </div>
+
 
   <div id="myModal" class="modalz">
     <span class="close">&times;</span>
     <img class="modalz-content" id="img01">
     <div id="captionz"></div>
   </div>
-  
-  
+    
     {% comment %} <script src="{% static "assets/js/util.js" %} "></script>
     <script src="{% static "assets/js/menu-aim.js" %} "></script>
     <script src="{% static "assets/js/main.js" %} "></script> {% endcomment %}
@@ -320,8 +748,25 @@
     <!-- JavaScript Bundle with Popper -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js" integrity="sha384-pprn3073KE6tl6bjs2QrFaJGz5/SUsLqktiwsUTF55Jfv3qYSDhgCecCxMW52nD2" crossorigin="anonymous"></script>
 <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
 <script>
 
+  let oid = `{{ order.order_id }}`;
+  localStorage.setItem("order_id", oid);
+
+                      
+  $(window).on('popstate', function() {
+    var modal = document.getElementById("myModal");
+    modal.style.display = "none";
+  });
+
+if(document.getElementById("reupload-ro-btn")){
+    let btn = document.getElementById("reupload-ro-btn");
+    btn.onclick = function(e){
+      document.querySelector(".reupload-ro-container").style.display = "block";
+      btn.style.display = "none";
+    }
+  }
   if(document.getElementById("myForm")){
     let myForm = document.getElementById("myForm");
     myForm.addEventListener("submit", (e)=>{
@@ -360,28 +805,365 @@
     
   }
 
-  if(document.getElementById("reuploadRoBtn")){
-    let reuploadRoBtn = document.getElementById("reuploadRoBtn");
-    reuploadRoBtn.addEventListener("click", (e)=>{
-      document.querySelector(".reupload-ro-container").style.display = "block";
-      document.querySelector("#reupload-btn-container").style.display = "none";
-      reuploadRoBtn.style.display = "none";
+
+  if(document.getElementById('discounted_amt')){
+    document.getElementById('discounted_amt').value = 0;
+  }
+  let order_id = localStorage.getItem("order_id");
+  if(document.getElementById("generateRoLink")){
+    let generate_ro_link = document.getElementById("generateRoLink");
+    let the_link = generate_ro_link.href;
+  
+    let link_len = the_link.length;
+    link_len = link_len - 1; // Removing _ from last
+    let new_link = the_link.substring(0, link_len)
+    generate_ro_link.href = new_link;
+    generate_ro_link.href += order_id;
+  }
+
+
+
+  
+  if(document.getElementById("modeOfPayment").value != "Cash"){
+    if(document.getElementById("trans_id_box")){
+      document.getElementById("trans_id_box").style.display = "block";
+    }
+  }
+  else{
+    if(document.getElementById("trans_id_box")){
+      document.getElementById("trans_id_box").style.display = "none";
+    }
+  }
+  
+  const toIndianCurrency = (x) => {
+    let num = parseInt(x, 10);
+    const curr = num.toLocaleString('en-IN', {
+       style: 'currency',
+       currency: 'INR'
+    });
+    
+    let ret = curr.substr(1,curr.length - 4)
+    return ret;
+  };
+
+  function changeMopEvent(ele){
+    let value = ele.value;
+    if(value != "Cash"){
+      document.getElementById("trans_id_box").style.display = "block";
+    }
+    else{
+      document.getElementById("trans_id_box").style.display = "none";
+      document.getElementById("transaction_id").value = "";
+    }
+  }
+
+  function changeMopEventAgency(ele){
+    
+    let value = ele.value;
+    if(value != "Cash" && value != "Cheque" && value != "Pdc_Cheque"){
+      document.getElementById("trans_id_box").style.display = "block";
+    }
+    else{
+      document.getElementById("trans_id_box").style.display = "none";
+      document.getElementById("transaction_id").value = "";
+    }
+    let agencyDiscountAmtEle = document.getElementById("agencyDiscountAmt")
+    let finalAmt = `{{ order.final_bill_amt }}`;  
+    
+
+    let discount_amt = 0;
+    let endAmt = 0;
+    
+    if(value == "Pdc_Cheque"){
+      discount_amt = finalAmt * (20 / 100);
+      endAmt = finalAmt - discount_amt;
+      agencyDiscountAmtEle.innerHTML = "<b>20%</b> Discount Final Amount : " + toIndianCurrency(finalAmt) + " - " + toIndianCurrency(discount_amt) +"(20% discount) = " + toIndianCurrency(endAmt);
+      agencyDiscountAmtEle.style.display = "block";
+    }
+    else{
+      discount_amt = finalAmt * (25 / 100);
+      endAmt = finalAmt - discount_amt;
+      agencyDiscountAmtEle.innerHTML = "<b>25%</b> Discount Final Amount : " + toIndianCurrency(finalAmt) + " - " + toIndianCurrency(discount_amt) +"(25% discount) = " + toIndianCurrency(endAmt);
+      agencyDiscountAmtEle.style.display = "block";
+    }
+  }
+
+  function removeAdBtnEvent(btn){
+    let advt_id = btn.parentElement.dataset.id;
+    let order_id = localStorage.getItem("order_id");
+    let url = "{% url 'delete_advt' %}";
+    let token = `{{ csrf_token }}`
+    let postData = new FormData();
+    postData.append("advt_id", advt_id);
+    postData.append("order_id", order_id);
+    postData.append("csrfmiddlewaretoken", token);
+    fetch(url, {
+      body: postData,
+      method : "POST"
+    })
+    .then(res => {
+      return res.json();
+    })
+    .then( data => {
+      console.log("Ad Deleted");
+      let lastAd = data["last_ad"];
+      if(lastAd){
+        btn.parentElement.parentElement.remove();
+        alert("Your cart is empty now...")
+        window.history.back()
+        
+      }
+      else{
+        btn.parentElement.parentElement.remove();
+        let old_total_ads = `{{ totalAds}}`;
+        old_total_ads -= 1;
+        let new_bill_amt = data["new_total_bill_amt"];
+
+        document.getElementById("totalAds").innerText = old_total_ads;
+        document.getElementById("totalBillAmt").innerText = new_bill_amt;
+        
+
+      }
+    })
+  }
+
+  // Give discount or not frontend logic
+  if(document.getElementById('confirmYesDiscountBtn')){
+    let confirmYesDiscountBtn = document.getElementById('confirmYesDiscountBtn');
+    confirmYesDiscountBtn.addEventListener("click", (e)=>{
+      document.querySelector(".discount-allow-container").style.display = "flex";
+      confirmYesDiscountBtn.style.display = "none";
+      document.querySelector(".payment-container").style.display = "none";
+    })
+  }
+  
+  if(document.getElementById('cancelDiscountBtn')){
+    let cancelDiscountBtn = document.getElementById('cancelDiscountBtn');
+    cancelDiscountBtn.addEventListener("click", (e)=>{
+      document.querySelector(".discount-allow-container").style.display = "none";
+      confirmYesDiscountBtn.style.display = "block";
+      document.querySelector(".payment-container").style.display = "block";
+    })
+  }
+  
+  let total_bill_amt =  `{{ order.total_bill_amt }}`;
+  function submitDiscountRequest(){
+    let discounted_amt = document.getElementById("discounted_amt").value;
+    let newPrice = parseInt(total_bill_amt) - discounted_amt;
+    let msg = "Do you really want to give " + discounted_amt + " ₹ Discount? New price will be " + newPrice + " ₹";
+    swal({
+              title: "Confirm",
+              text: msg,
+              icon: "warning",
+              buttons: true,
+              dangerMode: true,
+            })
+            .then( willDelete => {
+              if(willDelete){
+                let token = `{{ csrf_token }}`
+                let order_id = `{{ order.order_id }}`;
+
+                let postData = new FormData();
+                postData.append("order_id", order_id);                
+                postData.append("csrfmiddlewaretoken", token);
+                postData.append("discount_requested", discounted_amt);
+                postData.append("total_bill_amt", total_bill_amt);
+                let url = `{% url 'marketer_request_discount' %}`;
+                fetch(url, {
+                  body: postData,
+                  method : "POST"
+                })
+                .then(res=>{
+                  return res.json()
+                })
+                .then(data => {
+                  let result = data['result'];
+                  let msg = data['msg'];
+                  if(result){
+                    swal(msg, {
+                      icon: "success",
+                    })
+                    .then( value => {
+                      window.location.reload();
+                    })
+                  }
+                  else{
+                    swal({
+                      title: "Failure",
+                      text: msg,
+                      icon: "error",
+                      button: "OK"
+                    });
+                  }
+                    
+                })
+              
+            }
+          })
+
+  }
+
+  function submitGstRelaxRequest(){
+    let order_id = `{{ order.order_id }}`;
+    swal({
+      title: "Confirm",
+      text: "Do you really want to relax GST for this Order?",
+      icon: "warning",
+      buttons: true,
+      dangerMode: true,
+    })
+    .then( willDelete => {
+      if(willDelete){
+        let url = `{% url 'marketer_request_gst_relax' %}`;
+        let token = `{{ csrf_token }}`;
+
+        let postData = new FormData();
+        postData.append("csrfmiddlewaretoken", token);
+        postData.append("order_id", order_id);
+
+        fetch(url, {
+          method : "POST",
+          body : postData
+        })
+        .then(res=>{
+          return res.json();
+        })
+        .then(data => {
+            let result = data['result'];
+            let msg = data['msg'];
+            if(result){
+              swal(msg, {
+                icon: "success",
+              })
+              .then( value => {
+                window.location.reload();
+              })
+            }
+            else{
+              swal({
+                title: "Failure",
+                text: msg,
+                icon: "error",
+                button: "OK"
+              });
+            }
+          
+        })
+      }
     })
   }
 
 
 
+  function keyDownDiscountAmt(ele){
+    var ASCIICode = (ele.which) ? ele.which : ele.keyCode;
+    if (ASCIICode > 31 && (ASCIICode < 48 || ASCIICode > 57)){
+    }
+    else{
+        let amt = ele.target.value;
+        if(amt > parseInt(total_bill_amt)){
+          document.getElementById("discounted_amt").classList.add("is-invalid");
+        }
+        else{
+          document.getElementById("discounted_amt").classList.remove("is-invalid");
+        }
+        let newValue = parseInt(total_bill_amt) - amt;
+        document.getElementById("finalAmt").innerText = newValue;
+        
+    }
+  }
 
-var img = document.querySelector("#myImg");
+  if(document.getElementById("submitAdBtn")){
+    let submitAdBtn = document.getElementById("submitAdBtn");
+    submitAdBtn.addEventListener("click", (e)=>{
+      let mop_val = document.getElementById("modeOfPayment").value
+      if((mop_val != "Cash" && mop_val != "Pdc_Cheque" && mop_val != "Cheque") && document.getElementById("transaction_id").value == ""){
+        document.getElementById("transaction_id").classList.add("is-invalid");
+        return;
+      }
+      document.getElementById("transaction_id").classList.remove("is-invalid");
+      swal({
+              title: "Confirm",
+              text: "Are you sure?",
+              icon: "warning",
+              buttons: true,
+              dangerMode: true,
+          })
+          .then( willDelete => {
+            if(willDelete){
+              
+              let url = "{% url 'marketer_save_order' %}";
+              let modeOfPayment = document.getElementById("modeOfPayment").value;            
+              let transaction_id = document.getElementById("transaction_id").value;
+              let order_id = localStorage.getItem("order_id");
+              let token = `{{ csrf_token }}`
+  
+              
+              let postData = new FormData();
+              postData.append("order_id", order_id);
+              postData.append("mode_of_pay", modeOfPayment);
+              postData.append("transaction_id", transaction_id);
+              postData.append("csrfmiddlewaretoken", token);
+  
+              fetch(url, {
+                body: postData,
+                method : "POST"
+              })
+              .then(res => {
+                return res.json();
+              })
+              .then( data => {
+                console.log(data);
+                let result = data['result'];
+                let msg = data['msg'];
+                if(result){
+                  // swal({
+                  //     title: "Saved",
+                  //     text: msg,
+                  //     icon: "success",
+                  //     button: "OK"
+                  // });
+                  swal(msg, {
+                  icon: "success",
+                  })
+                  .then( value => {
+                      window.location.reload();
+                  })
+                }
+                else{
+                  swal({
+                      title: "Failure",
+                      text: msg,
+                      icon: "error",
+                      button: "OK"
+                  });
+                }
+              })
+            }
+          })
+      
+      })
+  }
+
+
+  var img = document.querySelector("#myImg");
 var modal = document.getElementById("myModal");
 
 var modalImg = document.getElementById("img01");
 var captionText = document.getElementById("captionz");
 
 img.onclick = function(){
-    modal.style.display = "block";
-    modalImg.src = this.dataset.src;
-    captionText.innerHTML = this.dataset.alt;
+    let url = img.dataset.src;
+    if(url.toLowerCase().includes(".png") ||  url.toLowerCase().includes(".jpg") || url.toLowerCase().includes(".jpeg")){
+      modal.style.display = "block";
+      modalImg.src = this.dataset.src;
+      captionText.innerHTML = this.dataset.alt;
+      
+    }
+    else{
+      window.open(url, "_blank");
+
+    }
   }
 
   // Get the <span> element that closes the modal

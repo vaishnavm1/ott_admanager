@@ -16,6 +16,13 @@ urlpatterns = [
 
     path('home/', views.marketer_home, name="marketer_home"),
     path('add-client/', views.marketer_add_client, name="marketer_add_client"),
+    
+    # Add client Ajax url
+    path('insert-client/', views.add_client, name="add_client"),
+
+
+    # Add Agency
+    path('add-agency/', views.marketer_add_agency, name="marketer_add_agency"),
 
 
     # Manage Ads
@@ -25,7 +32,9 @@ urlpatterns = [
     path('save-ad/', views.marketer_save_ad, name="marketer_save_ad"),
 
     # Second version [For only single ads]
-    path('save-ad-2/', views.marketer_save_ad2, name="marketer_save_ad2"),
+    # path('save-ad-2/', views.marketer_save_ad2, name="marketer_save_ad2"),
+    
+
     # Manage Cart
     path('view-cart/<str:order_id>', views.marketer_view_cart, name="marketer_view_cart"),
 
@@ -38,9 +47,24 @@ urlpatterns = [
     # Save Order
     path('order-save/', views.marketer_save_order, name="marketer_save_order"),
 
+    # Discount urls
+    path('marketer-request-discount/', views.marketer_request_discount, name="marketer_request_discount"),
+
+    # GST urls
+    path('marketer-request-gst-relax/', views.marketer_request_gst_relax, name="marketer_request_gst_relax"),
+
+
     # Generate RO
     path('generate-ro/<str:order_id>', views.generate_ro, name="generate_ro"),
     
+    # Request for RO
+    path('request-generate-ro/<str:order_id>', views.request_release_order, name="request_release_order"),
+
+
+    # Test Ajax request
+    path('test-ajax', views.test_ajax, name="test_ajax"),
+
+
 
     # Edit Add View
     path('edit-ads/', views.marketer_edit_ads, name="marketer_edit_ads"),

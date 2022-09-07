@@ -3,6 +3,8 @@ from django.http import HttpResponse
 from django.http import JsonResponse
 from user_admin.models import Post, Publisher, Order, Advt
 
+from django.db.models import Q
+
 from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.forms import AuthenticationForm
 
@@ -41,7 +43,13 @@ def publisher_home(request):
     id = request.user.id
     publisher = get_object_or_404(Publisher, id=id)
     # orders  =   Order.objects.filter(bill_status=True).exclude(signed_release_order="")
-    advts   =   Advt.objects.filter(order_id__bill_status = True).exclude(order_id__signed_release_order="").filter(is_published = False)
+    date = datetime.now().date()
+    q1 = Q(order_id__bill_status = True)
+    q2 = Q(order_id__signed_release_order="")
+    q3 = Q(is_published = False)
+    q4 = Q(ad_pub_date = None)
+    q5 = Q(ad_pub_date__date__lte=date)
+    advts   =   Advt.objects.filter(Q(q1)).exclude(Q(q2)).filter(Q(q3)).exclude(Q(q4)).filter(Q(q5))
     context = {
         "publisher": publisher,
         "advts": advts
